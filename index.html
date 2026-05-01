@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>萬年曆 & 待辦事項</title>
+<style>
+/* ══ Reset ══ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --accent: #64c8ff;
+  --accent2: #a78bfa;
+  --bg: transparent;
+  --panel: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.08);
+}
+html, body {
+  height: 100%;
+  font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+  background: linear-gradient(135deg, rgba(20,28,58,0.55), rgba(18,30,58,0.5), rgba(12,38,80,0.5));
+  color: #e8f4ff;
+  overflow: hidden;
+}
+body { display: flex; flex-direction: column; height: 100vh; }
+
+/* ══ 小工具模式標題列 ══ */
+.widget-bar {
+  background: rgba(10,22,40,0.45);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(100,200,255,0.12);
+  flex-shrink: 0;
+  -webkit-app-region: drag;
+  backdrop-filter: blur(12px);
+}
+.widget-bar-left {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--accent);
+  letter-spacing: 1px;
+  -webkit-app-region: drag;
+}
+.widget-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+}
+.badge {
+  font-size: 0.7rem;
+  background: rgba(100,200,255,0.18);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.icon-btn {
+  background: rgba(100,200,255,0.12);
+  border: 1px solid rgba(100,200,255,0.25);
+  color: rgba(100,200,255,0.75);
+  font-size: 0.9rem;
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  -webkit-app-region: no-drag;
+}
+.icon-btn:hover { background: rgba(100,200,255,0.3); color: var(--accent); }
+
+/* ══ 完整模式標題（寬螢幕） ══ */
+.full-header {
+  display: none;
+  text-align: center;
+  padding: 16px 20px 10px;
+  flex-shrink: 0;
+}
+.full-header h1 {
+  font-size: 1.8rem;
+  letter-spacing: 4px;
+  text-shadow: 0 0 20px rgba(100,200,255,0.5);
+  margin-bottom: 4px;
+}
+.full-header .clock {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+.full-header .date-info { font-size: 0.9rem; color: #aad4f5; }
+
+/* ══ 主體 flex ══ */
+.main-row {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ══ 行事曆（預設隱藏，寬螢幕顯示） ══ */
+.calendar-wrapper {
+  display: none;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 16px 16px 16px 20px;
+}
+.calendar-inner {
+  background: rgba(255,255,255,0.04);
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  backdrop-filter: blur(8px);
+}
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.nav button {
+  background: rgba(100,200,255,0.15);
+  border: 1px solid rgba(100,200,255,0.3);
+  color: var(--accent);
+  font-size: 1.2rem;
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.nav button:hover { background: rgba(100,200,255,0.35); }
+.nav-center { display: flex; align-items: center; gap: 8px; }
+.nav select {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(100,200,255,0.3);
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 4px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  outline: none;
+}
+.nav select option { background: #1a1a2e; }
+.today-btn {
+  background: rgba(100,200,255,0.2);
+  border: 1px solid rgba(100,200,255,0.4);
+  color: var(--accent);
+  font-size: 0.78rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.today-btn:hover { background: rgba(100,200,255,0.4); }
+.grid-header {
+  display: grid;
+  grid-template-columns: repeat(7,1fr);
+  text-align: center;
+  margin-bottom: 6px;
+}
+.grid-header span {
+  font-size: 0.78rem;
+  font-weight: bold;
+  padding: 5px 0;
+  color: #aad4f5;
+}
+.grid-header span:first-child { color: #ff7b7b; }
+.grid-header span:last-child  { color: #7bc8ff; }
+.grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.cell {
+  min-height: 76px;
+  border-radius: 8px;
+  padding: 5px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+.cell:hover { background: rgba(100,200,255,0.08); border-color: rgba(100,200,255,0.22); }
+.cell.empty { background: transparent; border-color: transparent; cursor: default; }
+.cell.today { background: rgba(100,200,255,0.12); border: 2px solid rgba(100,200,255,0.6); box-shadow: 0 0 8px rgba(100,200,255,0.18); }
+.cell.sunday  .day-num { color: #ff7b7b; }
+.cell.saturday .day-num { color: #7bc8ff; }
+.cell.holiday .day-num { color: #ff9f43 !important; }
+.day-num { font-size: 0.95rem; font-weight: bold; line-height: 1; }
+.lunar { font-size: 0.62rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.ev-cell { margin-top: 3px; display: flex; flex-direction: column; gap: 2px; overflow: hidden; }
+.ev-dot {
+  font-size: 0.6rem;
+  background: rgba(100,200,255,0.2);
+  border-left: 2px solid var(--accent);
+  padding: 1px 3px;
+  border-radius: 0 3px 3px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #cce8ff;
+}
+.ev-dot.loc { border-left-color: var(--accent2); background: rgba(167,139,250,0.15); color: #ddd6fe; }
+
+/* ══ 待辦面板 ══ */
+.todo-panel {
+  width: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 10px 12px;
+  gap: 8px;
+}
+.tabs { display: flex; gap: 5px; flex-shrink: 0; }
+.tab {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.45);
+  font-size: 0.72rem;
+  padding: 5px 0;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.tab.active {
+  background: rgba(100,200,255,0.18);
+  border-color: rgba(100,200,255,0.4);
+  color: var(--accent);
+}
+.pri-row { display: flex; gap: 5px; flex-shrink: 0; }
+.pri-btn {
+  flex: 1;
+  padding: 4px 0;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.4);
+}
+.pri-btn.sel-high { background: rgba(255,100,100,0.22); border-color: #ff6464; color: #ffaaaa; }
+.pri-btn.sel-mid  { background: rgba(255,180,0,0.18);   border-color: #ffb400; color: #ffd060; }
+.pri-btn.sel-low  { background: rgba(80,200,120,0.18);  border-color: #50c878; color: #80e8a0; }
+.add-row { display: flex; gap: 6px; flex-shrink: 0; }
+.add-row input {
+  flex: 1;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(100,200,255,0.22);
+  color: #fff;
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 0.84rem;
+  outline: none;
+  font-family: inherit;
+  user-select: text;
+}
+.add-row input:focus { border-color: rgba(100,200,255,0.55); background: rgba(100,200,255,0.07); }
+.add-row input::placeholder { color: rgba(255,255,255,0.28); }
+.add-btn {
+  background: rgba(100,200,255,0.22);
+  border: 1px solid rgba(100,200,255,0.38);
+  color: var(--accent);
+  font-size: 1.2rem;
+  width: 34px; height: 34px;
+  border-radius: 7px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.15s;
+}
+.add-btn:hover { background: rgba(100,200,255,0.42); }
+.todo-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-right: 2px;
+}
+.todo-list::-webkit-scrollbar { width: 4px; }
+.todo-list::-webkit-scrollbar-thumb { background: rgba(100,200,255,0.25); border-radius: 2px; }
+.t-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 8px 9px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  border-left: 3px solid rgba(255,255,255,0.15);
+  transition: all 0.15s;
+}
+.t-item:hover { background: rgba(255,255,255,0.07); }
+.t-item.pri-high { border-left-color: #ff6464; }
+.t-item.pri-mid  { border-left-color: #ffb400; }
+.t-item.pri-low  { border-left-color: #50c878; }
+.t-item.done { opacity: 0.42; }
+.chk {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  appearance: none;
+  border: 2px solid rgba(100,200,255,0.4);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1px;
+  position: relative;
+  background: transparent;
+  transition: all 0.15s;
+}
+.chk:checked { background: var(--accent); border-color: var(--accent); }
+.chk:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px; left: 1px;
+  font-size: 11px;
+  color: #0a1628;
+  font-weight: bold;
+}
+.t-body { flex: 1; min-width: 0; }
+.t-text {
+  font-size: 0.84rem;
+  line-height: 1.4;
+  word-break: break-all;
+  color: #ddeeff;
+  user-select: text;
+}
+.t-item.done .t-text { text-decoration: line-through; color: rgba(255,255,255,0.35); }
+.t-meta { font-size: 0.63rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
+.del-btn {
+  background: none;
+  border: none;
+  color: rgba(255,100,100,0.35);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0 2px;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+.del-btn:hover { color: #ff6464; }
+.t-empty { text-align: center; color: rgba(255,255,255,0.28); font-size: 0.8rem; padding: 24px 0; }
+.todo-bottom { flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; }
+.clear-btn {
+  width: 100%;
+  background: rgba(255,70,70,0.08);
+  border: 1px solid rgba(255,70,70,0.2);
+  color: rgba(255,120,120,0.6);
+  font-size: 0.75rem;
+  padding: 6px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.clear-btn:hover { background: rgba(255,70,70,0.2); color: #ff9090; }
+.dt-bar {
+  text-align: center;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.24);
+  padding: 2px 0;
+}
+/* 同步按鈕 */
+.sync-row { display: flex; gap: 5px; flex-shrink: 0; }
+.sync-btn {
+  flex: 1;
+  background: rgba(167,139,250,0.12);
+  border: 1px solid rgba(167,139,250,0.28);
+  color: rgba(167,139,250,0.85);
+  font-size: 0.7rem;
+  padding: 5px 0;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.sync-btn:hover { background: rgba(167,139,250,0.28); color: #c4b5fd; }
+/* 同步 Modal */
+.sync-modal-bg {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+}
+.sync-modal-bg.show { display: flex; }
+.sync-modal {
+  background: rgba(15,25,55,0.92);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(167,139,250,0.3);
+  border-radius: 14px;
+  padding: 22px;
+  width: 340px;
+  max-width: 95vw;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+}
+.sync-modal h3 { font-size: 1rem; color: #c4b5fd; margin-bottom: 14px; }
+.sync-modal textarea {
+  width: 100%;
+  height: 110px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(167,139,250,0.25);
+  color: #e0e0ff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  font-family: monospace;
+  resize: none;
+  outline: none;
+  margin-bottom: 10px;
+  user-select: text;
+}
+.sync-modal-btns { display: flex; gap: 7px; margin-bottom: 10px; }
+.sync-act-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: inherit;
+  border: none;
+  transition: all 0.15s;
+}
+.sync-act-btn.copy { background: rgba(100,200,255,0.2); color: #64c8ff; border: 1px solid rgba(100,200,255,0.35); }
+.sync-act-btn.copy:hover { background: rgba(100,200,255,0.38); }
+.sync-act-btn.import { background: rgba(80,200,120,0.2); color: #50e890; border: 1px solid rgba(80,200,120,0.35); }
+.sync-act-btn.import:hover { background: rgba(80,200,120,0.35); }
+.sync-modal-close {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: none;
+  color: #888;
+  padding: 7px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+.sync-modal-close:hover { color: #fff; background: rgba(255,255,255,0.13); }
+.sync-hint { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-bottom: 10px; line-height: 1.5; }
+
+/* ══ Modal ══ */
+.modal-bg {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-bg.show { display: flex; }
+.modal {
+  background: rgba(15,25,55,0.75);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(100,200,255,0.2);
+  border-radius: 14px;
+  padding: 22px 26px 18px;
+  width: 420px;
+  max-width: 96vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+}
+.modal h2 { font-size: 1rem; margin-bottom: 12px; color: var(--accent); line-height: 1.5; }
+.ev-list { margin-bottom: 12px; }
+.ev-card {
+  background: rgba(255,255,255,0.04);
+  border-radius: 9px;
+  padding: 9px 11px;
+  margin-bottom: 7px;
+  border-left: 3px solid rgba(100,200,255,0.5);
+  position: relative;
+}
+.ev-card.loc { border-left-color: var(--accent2); }
+.ev-card-title { font-size: 0.88rem; font-weight: bold; color: #e0f0ff; margin-bottom: 3px; padding-right: 66px; }
+.ev-card-loc  { font-size: 0.76rem; color: #c4b5fd; margin-bottom: 2px; }
+.ev-card-memo { font-size: 0.76rem; color: rgba(255,255,255,0.48); white-space: pre-wrap; word-break: break-all; }
+.ev-card-actions { position: absolute; top: 7px; right: 7px; display: flex; gap: 4px; }
+.btn-edit, .btn-del-ev {
+  border: none; font-size: 0.7rem; padding: 3px 7px; border-radius: 5px; cursor: pointer;
+}
+.btn-edit    { background: rgba(100,200,255,0.2); color: var(--accent); }
+.btn-edit:hover { background: rgba(100,200,255,0.4); }
+.btn-del-ev  { background: rgba(255,80,80,0.2); color: #ff8080; }
+.btn-del-ev:hover { background: rgba(255,80,80,0.4); }
+.form-sec {
+  background: rgba(255,255,255,0.03);
+  border-radius: 9px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(100,200,255,0.1);
+}
+.form-sec h3 { font-size: 0.8rem; color: var(--accent); margin-bottom: 9px; }
+.field { margin-bottom: 9px; }
+.field label { display: block; font-size: 0.74rem; color: rgba(255,255,255,0.48); margin-bottom: 3px; }
+.field input, .field textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.09);
+  border: 1px solid rgba(100,200,255,0.22);
+  color: #fff;
+  padding: 7px 9px;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+.field input:focus, .field textarea:focus { border-color: rgba(100,200,255,0.55); }
+.field input::placeholder, .field textarea::placeholder { color: rgba(255,255,255,0.28); }
+.field textarea { min-height: 60px; }
+.form-btns { display: flex; gap: 7px; }
+.btn-save {
+  flex: 1;
+  background: rgba(100,200,255,0.22);
+  border: 1px solid rgba(100,200,255,0.38);
+  color: var(--accent);
+  padding: 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.86rem;
+}
+.btn-save:hover { background: rgba(100,200,255,0.42); }
+.btn-cancel {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #aaa;
+  padding: 8px 13px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.86rem;
+}
+.btn-cancel:hover { background: rgba(255,255,255,0.14); color: #fff; }
+.modal-close {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: none;
+  color: #888;
+  padding: 8px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+.modal-close:hover { background: rgba(255,255,255,0.13); color: #fff; }
+.ev-empty { color: rgba(255,255,255,0.33); font-size: 0.8rem; padding: 5px 0 9px; text-align: center; }
+
+/* ══ 寬螢幕模式切換（≥520px） ══ */
+@media (min-width: 520px) {
+  body { overflow: auto; }
+  .widget-bar { display: none !important; }
+  .full-header { display: block; }
+  .main-row { align-items: flex-start; overflow: visible; }
+  .calendar-wrapper { display: block; }
+  .todo-panel {
+    width: 300px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border);
+    padding: 16px 14px 14px;
+    overflow-y: auto;
+    height: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- 小工具標題列（窄視窗專用） -->
+<div class="widget-bar">
+  <div class="widget-bar-left">☑ 待辦事項</div>
+  <div class="widget-bar-right">
+    <span class="badge" id="badge">0/0</span>
+    <button class="icon-btn" id="fsBtn" title="全螢幕 (F11)">⛶</button>
+  </div>
+</div>
+
+<!-- 完整標題列（寬視窗專用） -->
+<div class="full-header">
+  <h1>🗓 萬年曆</h1>
+  <div class="clock" id="clock">00:00:00</div>
+  <div class="date-info" id="dateInfo"></div>
+</div>
+
+<!-- 主體 -->
+<div class="main-row">
+
+  <!-- 行事曆 -->
+  <div class="calendar-wrapper">
+    <div class="calendar-inner">
+      <div class="nav">
+        <button id="prevYear">«</button>
+        <button id="prevMonth">‹</button>
+        <div class="nav-center">
+          <select id="yearSel"></select> 年
+          <select id="monthSel">
+            <option value="0">1月</option><option value="1">2月</option>
+            <option value="2">3月</option><option value="3">4月</option>
+            <option value="4">5月</option><option value="5">6月</option>
+            <option value="6">7月</option><option value="7">8月</option>
+            <option value="8">9月</option><option value="9">10月</option>
+            <option value="10">11月</option><option value="11">12月</option>
+          </select>
+          <button class="today-btn" id="todayBtn">今天</button>
+        </div>
+        <button id="nextMonth">›</button>
+        <button id="nextYear">»</button>
+      </div>
+      <div class="grid-header">
+        <span>日</span><span>一</span><span>二</span>
+        <span>三</span><span>四</span><span>五</span><span>六</span>
+      </div>
+      <div class="grid" id="calGrid"></div>
+    </div>
+  </div>
+
+  <!-- 待辦清單 -->
+  <div class="todo-panel">
+    <div class="tabs">
+      <button class="tab active" data-f="all">全部</button>
+      <button class="tab" data-f="pending">待辦</button>
+      <button class="tab" data-f="done">完成</button>
+    </div>
+    <div class="pri-row">
+      <button class="pri-btn" data-p="high">🔴 高</button>
+      <button class="pri-btn sel-mid" data-p="mid">🟡 中</button>
+      <button class="pri-btn" data-p="low">🟢 低</button>
+    </div>
+    <div class="add-row">
+      <input id="todoInp" type="text" placeholder="新增待辦事項…" maxlength="80">
+      <button class="add-btn" id="todoAddBtn">＋</button>
+    </div>
+    <div class="todo-list" id="todoList"></div>
+    <div class="todo-bottom">
+      <button class="clear-btn" id="clearBtn">🗑 清除已完成</button>
+      <div class="sync-row">
+        <button class="sync-btn" id="exportBtn">📤 匯出資料</button>
+        <button class="sync-btn" id="importBtn">📥 匯入資料</button>
+      </div>
+      <div class="dt-bar" id="dtBar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 同步 Modal -->
+<div class="sync-modal-bg" id="syncModalBg">
+  <div class="sync-modal">
+    <h3 id="syncModalTitle">📤 匯出資料</h3>
+    <p class="sync-hint" id="syncHint">複製下方文字，到另一台裝置選「匯入資料」貼上即可同步。</p>
+    <textarea id="syncTextarea" placeholder="資料將顯示於此…"></textarea>
+    <div class="sync-modal-btns">
+      <button class="sync-act-btn copy" id="syncCopyBtn">📋 複製</button>
+      <button class="sync-act-btn import" id="syncDoImportBtn" style="display:none">✅ 確認匯入</button>
+    </div>
+    <button class="sync-modal-close" id="syncModalClose">關閉</button>
+  </div>
+</div>
+
+<!-- 行程 Modal -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h2 id="modalTitle"></h2>
+    <div class="ev-list" id="evList"></div>
+    <div class="form-sec">
+      <h3 id="formTitle">＋ 新增行程</h3>
+      <div class="field"><label>📌 標題（必填）</label><input id="fTitle" placeholder="行程名稱" maxlength="50"></div>
+      <div class="field"><label>📍 地點</label><input id="fLoc" placeholder="地址或場所名稱" maxlength="80"></div>
+      <div class="field"><label>📝 備忘錄</label><textarea id="fMemo" placeholder="詳細說明…" maxlength="500"></textarea></div>
+      <div class="form-btns">
+        <button class="btn-save" id="btnSave">儲存</button>
+        <button class="btn-cancel" id="btnCancel" style="display:none">取消</button>
+      </div>
+    </div>
+    <button class="modal-close" id="modalClose">關閉</button>
+  </div>
+</div>
+
+<script>
+// ══ 農曆 ══════════════════════════════════════════════════════════
+const LD=[0x04AE53,0x0A5748,0x5526BD,0x0D2650,0x0D9544,0x46AAB9,0x056A4D,0x09AD42,0x24AEB6,0x04AE4A,0x6A4DBE,0x0A4D52,0x0D2546,0x5D52BA,0x0B544E,0x0D6A43,0x296D37,0x095B4B,0x749BC1,0x049754,0x0A4B48,0x5B25BC,0x06A550,0x06D445,0x4ADAB8,0x02B64D,0x095742,0x2497B7,0x04974A,0x664B3E,0x0D4A51,0x0EA546,0x56D4BA,0x05AD4E,0x02B644,0x393738,0x092E4B,0x7C96BF,0x0C9553,0x0D4A48,0x6DA53B,0x0B554F,0x056A45,0x4AADB9,0x025D4D,0x092D42,0x2C95B6,0x0A954A,0x7B4ABD,0x06CA51,0x0B5546,0x555ABB,0x04DA4E,0x0A5B43,0x352BB8,0x052B4C,0x8A953F,0x0E9552,0x06AA48,0x6AD53C,0x0AB54F,0x04B645,0x4A5739,0x0A574D,0x052642,0x3E9335,0x0D9549,0x75AABE,0x056A51,0x096D46,0x54AEBB,0x04AD4F,0x0A4D43,0x4D26B7,0x0D254B,0x8D52BF,0x0B5452,0x0B6A47,0x696D3C,0x095B50,0x049B45,0x4A4BB9,0x0A4B4D,0xAB25C2,0x06A554,0x06D449,0x6ADA3D,0x0AB651,0x093746,0x5497BB,0x04974F,0x064B44,0x36A537,0x0EA54A,0x86B2BF,0x05AC53,0x0AB647,0x5936BC,0x092E50,0x0C9645,0x4D4AB8,0x0D4A4C,0x0DA541,0x25AAB6,0x056A49,0x7AADBD,0x025D52,0x092D47,0x5C95BA,0x0A954E,0x0B4A43,0x4B5537,0x0AD54A,0x955ABF,0x04BA53,0x0A5B48,0x652BBC,0x052B50,0x0A9345,0x474AB9,0x06AA4C,0x0AD541,0x24DAB6,0x04B64A,0x69573D,0x0A4E51,0x0D2646,0x5E933A,0x0D534D,0x05AA43,0x36B537,0x096D4B,0xB4AEBF,0x04AD53,0x0A4D48,0x6D25BC,0x0D254F,0x0D5244,0x5DAA38,0x0B5A4C,0x056D41,0x24ADB6,0x049B4A,0x7A4BBE,0x0A4B51,0x0AA546,0x5B52BA,0x06D24E,0x0ADA42,0x355B37,0x09374B,0x8497C1,0x049753,0x064B48,0x66A53C,0x0EA54F,0x06B244,0x4AAB38,0x0AAE4C,0x092E42,0x3C9735,0x0C9649,0x7D4ABD,0x0D4A51,0x0DA545,0x55AABA,0x056A4E,0x0A6D43,0x452EB7,0x052D4B,0x8A95BF,0x0A9553,0x0B4A47,0x6B553B,0x0AD54F,0x055A45,0x4A5D38,0x0A5B4C,0x052B42,0x3A93B6,0x069349,0x7729BD,0x06AA51,0x0AD546,0x54DABA,0x04B64E,0x0A5743,0x452738,0x0D264A,0x8E933E,0x0D5252,0x0DAA47,0x66B53B,0x056D4F,0x04AE45,0x4A4EB9,0x0A4D4C,0x0D1541,0x2D92B5];
+const LMN=['正','二','三','四','五','六','七','八','九','十','冬','臘'];
+const LDN=['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十','十一','十二','十三','十四','十五','十六','十七','十八','十九','二十','廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+function lmn(y){return LD[y-1900]&0xf;}
+function ld(y){return lmn(y)?((LD[y-1900]&0x10000)?30:29):0;}
+function md(y,m){return(LD[y-1900]&(0x10000>>m))?30:29;}
+function lyd(y){let s=348;for(let i=0x8000;i>0x8;i>>=1)s+=(LD[y-1900]&i)?1:0;return s+ld(y);}
+function lunarDate(sY,sM,sD){
+  const base=new Date(1900,0,31);
+  let off=Math.round((new Date(sY,sM-1,sD)-base)/86400000),i,tmp=0,lM,lD,isLY=false;
+  for(i=1900;i<2100&&off>0;i++){tmp=lyd(i);off-=tmp;}
+  if(off<=0){off+=tmp;i--;}
+  const y=i,lp=lmn(y);
+  for(i=1;i<=12&&off>0;i++){
+    if(lp>0&&lp===i-1&&!isLY){isLY=true;i--;tmp=ld(y);}
+    else{isLY=false;tmp=md(y,i);}
+    off-=tmp;
+  }
+  if(off===0&&lp>0&&i===lp+1)isLY=isLY?false:(i--,true);
+  if(off<0){off+=tmp;i--;}
+  return{m:i,d:off+1,leap:isLY};
+}
+function lunarStr(y,m,d){
+  try{const l=lunarDate(y,m,d);return l.d===1?(l.leap?'閏':'')+LMN[l.m-1]+'月':LDN[l.d-1];}catch(e){return'';}
+}
+
+// ══ 假日 ══
+function holidays(y){
+  return{[`${y}-01-01`]:'元旦',[`${y}-02-28`]:'和平紀念日',[`${y}-04-04`]:'兒童節',[`${y}-04-05`]:'清明節',[`${y}-05-01`]:'勞動節',[`${y}-06-10`]:'端午節',[`${y}-09-28`]:'教師節',[`${y}-10-10`]:'國慶日',[`${y}-12-25`]:'行憲紀念日'};
+}
+
+// ══ 行程資料 ══
+const EV_KEY='calendar_events_v2';
+function loadEv(){try{const r=localStorage.getItem(EV_KEY);if(r)return JSON.parse(r);const o=localStorage.getItem('calendar_events_v1');if(o){const d=JSON.parse(o);const m={};for(const[k,a]of Object.entries(d))m[k]=a.map(s=>({title:s,loc:'',memo:''}));return m;}return{};}catch(e){return{};}}
+function saveEv(){localStorage.setItem(EV_KEY,JSON.stringify(evs));}
+let evs=loadEv();
+
+// ══ 待辦資料 ══
+const TODO_KEY='todo_list_v1';
+let todos=[];
+try{todos=JSON.parse(localStorage.getItem(TODO_KEY))||[];}catch(e){}
+function saveTodos(){localStorage.setItem(TODO_KEY,JSON.stringify(todos));}
+
+// ══ 時鐘 ══
+const now0=new Date();
+let curY=now0.getFullYear(), curM=now0.getMonth();
+const WN=['日','一','二','三','四','五','六'];
+function tick(){
+  const n=new Date();
+  const t=document.getElementById('clock');
+  if(t)t.textContent=[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>String(x).padStart(2,'0')).join(':');
+  const di=document.getElementById('dateInfo');
+  if(di)di.textContent=`${n.getFullYear()} 年 ${n.getMonth()+1} 月 ${n.getDate()} 日　星期${WN[n.getDay()]}　農曆 ${lunarStr(n.getFullYear(),n.getMonth()+1,n.getDate())}`;
+  const db=document.getElementById('dtBar');
+  if(db)db.textContent=`${n.getMonth()+1}/${n.getDate()} 星期${WN[n.getDay()]}  `+[n.getHours(),n.getMinutes()].map(x=>String(x).padStart(2,'0')).join(':');
+}
+setInterval(tick,1000); tick();
+
+// ══ 年份選單 ══
+const yearSel=document.getElementById('yearSel');
+if(yearSel){for(let y=1924;y<=2100;y++){const o=document.createElement('option');o.value=y;o.textContent=y;if(y===curY)o.selected=true;yearSel.appendChild(o);}}
+
+// ══ 月曆渲染 ══
+function p2(n){return String(n).padStart(2,'0');}
+function dk(y,m,d){return`${y}-${p2(m+1)}-${p2(d)}`;}
+function renderCal(){
+  if(yearSel)yearSel.value=curY;
+  const ms=document.getElementById('monthSel');
+  if(ms)ms.value=curM;
+  const grid=document.getElementById('calGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  const fd=new Date(curY,curM,1).getDay();
+  const dim=new Date(curY,curM+1,0).getDate();
+  const hols=holidays(curY);
+  for(let i=0;i<fd;i++){const c=document.createElement('div');c.className='cell empty';grid.appendChild(c);}
+  for(let d=1;d<=dim;d++){
+    const dow=new Date(curY,curM,d).getDay();
+    const key=dk(curY,curM,d);
+    const isT=curY===now0.getFullYear()&&curM===now0.getMonth()&&d===now0.getDate();
+    const isH=!!hols[key];
+    let cls='cell';
+    if(isT)cls+=' today';if(dow===0)cls+=' sunday';if(dow===6)cls+=' saturday';if(isH)cls+=' holiday';
+    const cell=document.createElement('div');
+    cell.className=cls;
+    const ln=lunarStr(curY,curM+1,d);
+    cell.innerHTML=`<span class="day-num">${d}</span><span class="lunar">${isH?hols[key]:(ln||'')}</span><div class="ev-cell" id="evc-${key}"></div>`;
+    cell.addEventListener('click',()=>openModal(curY,curM,d));
+    grid.appendChild(cell);
+    renderEvCell(key);
+  }
+}
+function renderEvCell(key){
+  const c=document.getElementById(`evc-${key}`);
+  if(!c)return;
+  c.innerHTML='';
+  const a=evs[key]||[];
+  a.slice(0,2).forEach(e=>{
+    const d=document.createElement('div');
+    d.className='ev-dot'+(e.loc?' loc':'');
+    d.textContent=(e.loc?'📍':'•')+' '+e.title;
+    c.appendChild(d);
+  });
+  if(a.length>2){const m=document.createElement('div');m.className='ev-dot';m.textContent=`+${a.length-2}`;c.appendChild(m);}
+}
+
+// ══ 行程 Modal ══
+let mKey='', editIdx=-1;
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function openModal(y,m,d){
+  mKey=dk(y,m,d);editIdx=-1;
+  const dow=new Date(y,m,d).getDay();
+  const hols=holidays(y);
+  document.getElementById('modalTitle').textContent=`${y}/${p2(m+1)}/${p2(d)} 星期${WN[dow]}　${lunarStr(y,m+1,d)}${hols[mKey]?'　🎉'+hols[mKey]:''}`;
+  resetForm();renderEvList();
+  document.getElementById('modalBg').classList.add('show');
+  document.getElementById('fTitle').focus();
+}
+function renderEvList(){
+  const list=document.getElementById('evList');list.innerHTML='';
+  const a=evs[mKey]||[];
+  if(!a.length){list.innerHTML='<div class="ev-empty">尚無行程</div>';return;}
+  a.forEach((e,i)=>{
+    const card=document.createElement('div');
+    card.className='ev-card'+(e.loc?' loc':'');
+    card.innerHTML=`<div class="ev-card-title">${esc(e.title)}</div>${e.loc?`<div class="ev-card-loc">📍 ${esc(e.loc)}</div>`:''}${e.memo?`<div class="ev-card-memo">📝 ${esc(e.memo)}</div>`:''}
+    <div class="ev-card-actions"><button class="btn-edit">編輯</button><button class="btn-del-ev">刪除</button></div>`;
+    card.querySelector('.btn-edit').addEventListener('click',()=>startEdit(i));
+    card.querySelector('.btn-del-ev').addEventListener('click',()=>delEv(i));
+    list.appendChild(card);
+  });
+}
+function resetForm(){
+  editIdx=-1;
+  document.getElementById('formTitle').textContent='＋ 新增行程';
+  document.getElementById('fTitle').value='';
+  document.getElementById('fLoc').value='';
+  document.getElementById('fMemo').value='';
+  document.getElementById('btnCancel').style.display='none';
+}
+function startEdit(i){
+  editIdx=i;const e=evs[mKey][i];
+  document.getElementById('formTitle').textContent='✏️ 編輯行程';
+  document.getElementById('fTitle').value=e.title||'';
+  document.getElementById('fLoc').value=e.loc||'';
+  document.getElementById('fMemo').value=e.memo||'';
+  document.getElementById('btnCancel').style.display='';
+  document.getElementById('fTitle').focus();
+}
+function saveEv2(){
+  const title=document.getElementById('fTitle').value.trim();
+  if(!title){document.getElementById('fTitle').focus();return;}
+  const loc=document.getElementById('fLoc').value.trim();
+  const memo=document.getElementById('fMemo').value.trim();
+  if(!evs[mKey])evs[mKey]=[];
+  if(editIdx>=0)evs[mKey][editIdx]={title,loc,memo};
+  else evs[mKey].push({title,loc,memo});
+  saveEv();resetForm();renderEvList();renderEvCell(mKey);
+}
+function delEv(i){
+  evs[mKey].splice(i,1);
+  if(!evs[mKey].length)delete evs[mKey];
+  saveEv();if(editIdx===i)resetForm();renderEvList();renderEvCell(mKey);
+}
+document.getElementById('btnSave').addEventListener('click',saveEv2);
+document.getElementById('btnCancel').addEventListener('click',resetForm);
+document.getElementById('fTitle').addEventListener('keydown',e=>{if(e.key==='Enter')saveEv2();});
+document.getElementById('modalClose').addEventListener('click',()=>document.getElementById('modalBg').classList.remove('show'));
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))document.getElementById('modalBg').classList.remove('show');});
+
+// ══ 月曆導航 ══
+function go(dy,dm){curY+=dy;curM+=dm;if(curM>11){curM-=12;curY++;}if(curM<0){curM+=12;curY--;}renderCal();}
+document.getElementById('prevYear')?.addEventListener('click',()=>go(-1,0));
+document.getElementById('nextYear')?.addEventListener('click',()=>go(1,0));
+document.getElementById('prevMonth')?.addEventListener('click',()=>go(0,-1));
+document.getElementById('nextMonth')?.addEventListener('click',()=>go(0,1));
+document.getElementById('todayBtn')?.addEventListener('click',()=>{curY=now0.getFullYear();curM=now0.getMonth();renderCal();});
+yearSel?.addEventListener('change',()=>{curY=+yearSel.value;renderCal();});
+document.getElementById('monthSel')?.addEventListener('change',e=>{curM=+e.target.value;renderCal();});
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('modalBg').classList.contains('show'))return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+  if(e.key==='ArrowLeft')go(0,-1);
+  if(e.key==='ArrowRight')go(0,1);
+  if(e.key==='ArrowUp')go(-1,0);
+  if(e.key==='ArrowDown')go(1,0);
+  if(e.key==='Home'||e.key==='t'){curY=now0.getFullYear();curM=now0.getMonth();renderCal();}
+});
+
+// ══ 待辦清單 ══
+let tFilter='all', tPri='mid';
+const priLabel={high:'🔴高',mid:'🟡中',low:'🟢低'};
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    tFilter=t.dataset.f;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    renderTodos();
+  });
+});
+document.querySelectorAll('.pri-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    tPri=b.dataset.p;
+    document.querySelectorAll('.pri-btn').forEach(x=>x.className='pri-btn');
+    b.classList.add('sel-'+tPri);
+  });
+});
+function addTodo(){
+  const inp=document.getElementById('todoInp');
+  const text=inp.value.trim();
+  if(!text)return;
+  todos.unshift({id:Date.now(),text,pri:tPri,done:false,created:new Date().toLocaleDateString('zh-TW')});
+  saveTodos();inp.value='';renderTodos();
+}
+document.getElementById('todoAddBtn').addEventListener('click',addTodo);
+document.getElementById('todoInp').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
+document.getElementById('clearBtn').addEventListener('click',()=>{todos=todos.filter(x=>!x.done);saveTodos();renderTodos();});
+
+function renderTodos(){
+  const list=document.getElementById('todoList');
+  list.innerHTML='';
+  const done=todos.filter(x=>x.done).length;
+  document.getElementById('badge').textContent=`${done}/${todos.length}`;
+  let show=todos;
+  if(tFilter==='pending')show=todos.filter(x=>!x.done);
+  if(tFilter==='done')show=todos.filter(x=>x.done);
+  if(!show.length){list.innerHTML=`<div class="t-empty">${tFilter==='done'?'尚無完成項目':'沒有待辦事項 🎉'}</div>`;return;}
+  show.forEach(t=>{
+    const div=document.createElement('div');
+    div.className=`t-item pri-${t.pri}${t.done?' done':''}`;
+    div.innerHTML=`<input type="checkbox" class="chk" ${t.done?'checked':''}><div class="t-body"><div class="t-text">${esc(t.text)}</div><div class="t-meta">${priLabel[t.pri]} · ${t.created||''}</div></div><button class="del-btn">✕</button>`;
+    div.querySelector('.chk').addEventListener('change',()=>{const it=todos.find(x=>x.id===t.id);if(it){it.done=!it.done;saveTodos();renderTodos();}});
+    div.querySelector('.del-btn').addEventListener('click',()=>{todos=todos.filter(x=>x.id!==t.id);saveTodos();renderTodos();});
+    list.appendChild(div);
+  });
+}
+window.addEventListener('storage',e=>{
+  if(e.key===TODO_KEY){try{todos=JSON.parse(e.newValue)||[];}catch(x){}renderTodos();}
+  if(e.key===EV_KEY){try{evs=JSON.parse(e.newValue)||{};}catch(x){}renderCal();}
+});
+
+// ══ 全螢幕 ══
+function toggleFS(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+document.getElementById('fsBtn').addEventListener('click',toggleFS);
+document.addEventListener('keydown',e=>{if(e.key==='F11'){e.preventDefault();toggleFS();}});
+document.addEventListener('fullscreenchange',()=>{
+  const btn=document.getElementById('fsBtn');
+  btn.textContent=document.fullscreenElement?'⊡':'⛶';
+  btn.title=document.fullscreenElement?'離開全螢幕 (F11)':'全螢幕 (F11)';
+});
+
+// ══ 匯出 / 匯入 ══
+let syncMode = 'export';
+
+function openSyncModal(mode) {
+  syncMode = mode;
+  const bg = document.getElementById('syncModalBg');
+  const title = document.getElementById('syncModalTitle');
+  const hint = document.getElementById('syncHint');
+  const ta = document.getElementById('syncTextarea');
+  const copyBtn = document.getElementById('syncCopyBtn');
+  const importBtn = document.getElementById('syncDoImportBtn');
+
+  if (mode === 'export') {
+    title.textContent = '📤 匯出資料';
+    hint.textContent = '複製下方文字，到另一台裝置選「匯入資料」貼上即可同步。';
+    const data = { todos, evs, exported: new Date().toLocaleString('zh-TW') };
+    ta.value = JSON.stringify(data);
+    ta.readOnly = true;
+    copyBtn.style.display = '';
+    importBtn.style.display = 'none';
+  } else {
+    title.textContent = '📥 匯入資料';
+    hint.textContent = '請貼上從另一台裝置匯出的文字，再按「確認匯入」。';
+    ta.value = '';
+    ta.readOnly = false;
+    copyBtn.style.display = 'none';
+    importBtn.style.display = '';
+  }
+  bg.classList.add('show');
+  if (mode === 'export') { ta.select(); } else { ta.focus(); }
+}
+
+document.getElementById('exportBtn').addEventListener('click', () => openSyncModal('export'));
+document.getElementById('importBtn').addEventListener('click', () => openSyncModal('import'));
+
+document.getElementById('syncCopyBtn').addEventListener('click', () => {
+  const ta = document.getElementById('syncTextarea');
+  ta.select();
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = document.getElementById('syncCopyBtn');
+    btn.textContent = '✅ 已複製！';
+    setTimeout(() => btn.textContent = '📋 複製', 1800);
+  }).catch(() => { document.execCommand('copy'); });
+});
+
+document.getElementById('syncDoImportBtn').addEventListener('click', () => {
+  try {
+    const data = JSON.parse(document.getElementById('syncTextarea').value.trim());
+    if (data.todos) { todos = data.todos; saveTodos(); }
+    if (data.evs)   { evs   = data.evs;   saveEv();    }
+    renderTodos(); renderCal();
+    document.getElementById('syncModalBg').classList.remove('show');
+    alert('匯入成功！');
+  } catch(e) {
+    alert('格式錯誤，請確認貼上的內容正確。');
+  }
+});
+
+document.getElementById('syncModalClose').addEventListener('click', () => {
+  document.getElementById('syncModalBg').classList.remove('show');
+});
+document.getElementById('syncModalBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('syncModalBg'))
+    document.getElementById('syncModalBg').classList.remove('show');
+});
+
+// ══ 初始化 ══
+renderCal();
+renderTodos();
+</script>
+</body>
+</html>
