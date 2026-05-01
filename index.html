@@ -1284,10 +1284,9 @@ document.getElementById('syncModalBg').addEventListener('click', e => {
 });
 
 // ══ 初始化 ══
-openIDB().then(()=>{
-  renderCal();
-  renderTodos();
-});
+renderCal();
+renderTodos();
+openIDB().catch(e => console.warn('IndexedDB 無法開啟，圖片功能停用', e));
 </script>
 </body>
 </html>
