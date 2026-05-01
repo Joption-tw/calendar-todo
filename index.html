@@ -548,6 +548,116 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .modal-close:hover { background: rgba(255,255,255,0.13); color: #fff; }
 .ev-empty { color: rgba(255,255,255,0.33); font-size: 0.8rem; padding: 5px 0 9px; text-align: center; }
 
+/* ══ 圖片上傳區 ══ */
+.img-drop-zone {
+  border: 1.5px dashed rgba(100,200,255,0.3);
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(100,200,255,0.03);
+  position: relative;
+}
+.img-drop-zone:hover, .img-drop-zone.drag-over {
+  border-color: rgba(100,200,255,0.6);
+  background: rgba(100,200,255,0.08);
+}
+.img-drop-hint {
+  font-size: 0.74rem;
+  color: rgba(255,255,255,0.35);
+  pointer-events: none;
+}
+.img-drop-hint span { font-size: 1.1rem; display: block; margin-bottom: 2px; }
+.img-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+}
+.img-thumb-wrap {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.img-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.img-thumb-del {
+  position: absolute;
+  top: 2px; right: 2px;
+  background: rgba(0,0,0,0.65);
+  color: #ff8080;
+  border: none;
+  border-radius: 50%;
+  width: 18px; height: 18px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.img-thumb-del:hover { background: rgba(200,0,0,0.7); color: #fff; }
+
+/* 圖片卡片區（顯示在行程卡片內） */
+.ev-card-imgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+.ev-card-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 5px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: transform 0.15s;
+}
+.ev-card-img:hover { transform: scale(1.05); }
+
+/* 圖片燈箱 */
+.lightbox-bg {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.88);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+}
+.lightbox-bg.show { display: flex; }
+.lightbox-bg img {
+  max-width: 92vw;
+  max-height: 80vh;
+  border-radius: 10px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.8);
+  object-fit: contain;
+}
+.lightbox-btns { display: flex; gap: 10px; }
+.lightbox-btn {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.lightbox-btn:hover { background: rgba(255,255,255,0.28); }
+.lightbox-btn.dl { background: rgba(100,200,255,0.25); color: var(--accent); }
+
 /* ══ 寬螢幕模式切換（≥520px） ══ */
 @media (min-width: 520px) {
   body { overflow: auto; }
@@ -644,6 +754,15 @@ body { display: flex; flex-direction: column; height: 100vh; }
   </div>
 </div>
 
+<!-- 圖片燈箱 -->
+<div class="lightbox-bg" id="lightboxBg">
+  <img id="lightboxImg" src="" alt="圖片">
+  <div class="lightbox-btns">
+    <button class="lightbox-btn dl" id="lightboxDl">⬇ 下載</button>
+    <button class="lightbox-btn" id="lightboxClose">✕ 關閉</button>
+  </div>
+</div>
+
 <!-- 同步 Modal -->
 <div class="sync-modal-bg" id="syncModalBg">
   <div class="sync-modal">
@@ -668,6 +787,14 @@ body { display: flex; flex-direction: column; height: 100vh; }
       <div class="field"><label>📌 標題（必填）</label><input id="fTitle" placeholder="行程名稱" maxlength="50"></div>
       <div class="field"><label>📍 地點</label><input id="fLoc" placeholder="地址或場所名稱" maxlength="80"></div>
       <div class="field"><label>📝 備忘錄</label><textarea id="fMemo" placeholder="詳細說明…" maxlength="500"></textarea></div>
+      <div class="field">
+        <label>🖼 圖片（點擊上傳 / 拖曳 / 直接貼上 Ctrl+V）</label>
+        <div class="img-drop-zone" id="imgDropZone">
+          <div class="img-drop-hint"><span>🖼</span>點此選擇圖片，或直接拖曳 / 貼上</div>
+          <input type="file" id="imgFileInput" accept="image/*" multiple style="display:none">
+        </div>
+        <div class="img-preview-row" id="imgPreviewRow"></div>
+      </div>
       <div class="form-btns">
         <button class="btn-save" id="btnSave">儲存</button>
         <button class="btn-cancel" id="btnCancel" style="display:none">取消</button>
@@ -708,6 +835,39 @@ function lunarStr(y,m,d){
 // ══ 假日 ══
 function holidays(y){
   return{[`${y}-01-01`]:'元旦',[`${y}-02-28`]:'和平紀念日',[`${y}-04-04`]:'兒童節',[`${y}-04-05`]:'清明節',[`${y}-05-01`]:'勞動節',[`${y}-06-10`]:'端午節',[`${y}-09-28`]:'教師節',[`${y}-10-10`]:'國慶日',[`${y}-12-25`]:'行憲紀念日'};
+}
+
+// ══ IndexedDB 圖片儲存 ══
+const IDB_NAME = 'calImgDB', IDB_VER = 1;
+let idb = null;
+function openIDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(IDB_NAME, IDB_VER);
+    req.onupgradeneeded = e => e.target.result.createObjectStore('imgs', { keyPath: 'id' });
+    req.onsuccess = e => { idb = e.target.result; res(idb); };
+    req.onerror   = e => rej(e);
+  });
+}
+function idbSave(id, dataUrl) {
+  return new Promise((res, rej) => {
+    const tx = idb.transaction('imgs','readwrite');
+    tx.objectStore('imgs').put({ id, dataUrl });
+    tx.oncomplete = res; tx.onerror = rej;
+  });
+}
+function idbGet(id) {
+  return new Promise((res, rej) => {
+    const req = idb.transaction('imgs','readonly').objectStore('imgs').get(id);
+    req.onsuccess = e => res(e.target.result?.dataUrl);
+    req.onerror   = rej;
+  });
+}
+function idbDel(id) {
+  return new Promise((res, rej) => {
+    const tx = idb.transaction('imgs','readwrite');
+    tx.objectStore('imgs').delete(id);
+    tx.oncomplete = res; tx.onerror = rej;
+  });
 }
 
 // ══ 行程資料 ══
@@ -797,6 +957,9 @@ function openModal(y,m,d){
   document.getElementById('modalBg').classList.add('show');
   document.getElementById('fTitle').focus();
 }
+// formImgs: [{id,dataUrl}] 目前表單中的圖片（含新增的）
+let formImgs = [];
+
 function renderEvList(){
   const list=document.getElementById('evList');list.innerHTML='';
   const a=evs[mKey]||[];
@@ -804,50 +967,170 @@ function renderEvList(){
   a.forEach((e,i)=>{
     const card=document.createElement('div');
     card.className='ev-card'+(e.loc?' loc':'');
-    card.innerHTML=`<div class="ev-card-title">${esc(e.title)}</div>${e.loc?`<div class="ev-card-loc">📍 ${esc(e.loc)}</div>`:''}${e.memo?`<div class="ev-card-memo">📝 ${esc(e.memo)}</div>`:''}
-    <div class="ev-card-actions"><button class="btn-edit">編輯</button><button class="btn-del-ev">刪除</button></div>`;
+    card.innerHTML=`
+      <div class="ev-card-title">${esc(e.title)}</div>
+      ${e.loc?`<div class="ev-card-loc">📍 ${esc(e.loc)}</div>`:''}
+      ${e.memo?`<div class="ev-card-memo">📝 ${esc(e.memo)}</div>`:''}
+      <div class="ev-card-imgs" id="ci-${mKey}-${i}"></div>
+      <div class="ev-card-actions"><button class="btn-edit">編輯</button><button class="btn-del-ev">刪除</button></div>`;
     card.querySelector('.btn-edit').addEventListener('click',()=>startEdit(i));
     card.querySelector('.btn-del-ev').addEventListener('click',()=>delEv(i));
     list.appendChild(card);
+    // 非同步載入圖片
+    if(e.images && e.images.length){
+      const imgRow = document.getElementById(`ci-${mKey}-${i}`);
+      e.images.forEach(id=>{
+        idbGet(id).then(dataUrl=>{
+          if(!dataUrl||!imgRow)return;
+          const img=document.createElement('img');
+          img.className='ev-card-img';
+          img.src=dataUrl;
+          img.addEventListener('click',()=>openLightbox(dataUrl));
+          imgRow.appendChild(img);
+        });
+      });
+    }
   });
 }
+
 function resetForm(){
-  editIdx=-1;
+  editIdx=-1; formImgs=[];
   document.getElementById('formTitle').textContent='＋ 新增行程';
   document.getElementById('fTitle').value='';
   document.getElementById('fLoc').value='';
   document.getElementById('fMemo').value='';
   document.getElementById('btnCancel').style.display='none';
+  document.getElementById('imgPreviewRow').innerHTML='';
 }
+
 function startEdit(i){
-  editIdx=i;const e=evs[mKey][i];
+  editIdx=i; formImgs=[];
+  const e=evs[mKey][i];
   document.getElementById('formTitle').textContent='✏️ 編輯行程';
   document.getElementById('fTitle').value=e.title||'';
   document.getElementById('fLoc').value=e.loc||'';
   document.getElementById('fMemo').value=e.memo||'';
   document.getElementById('btnCancel').style.display='';
+  document.getElementById('imgPreviewRow').innerHTML='';
+  // 載入既有圖片到 formImgs
+  if(e.images && e.images.length){
+    e.images.forEach(id=>{
+      idbGet(id).then(dataUrl=>{
+        if(!dataUrl)return;
+        formImgs.push({id,dataUrl});
+        addThumb(id,dataUrl);
+      });
+    });
+  }
   document.getElementById('fTitle').focus();
 }
-function saveEv2(){
+
+async function saveEv2(){
   const title=document.getElementById('fTitle').value.trim();
   if(!title){document.getElementById('fTitle').focus();return;}
   const loc=document.getElementById('fLoc').value.trim();
   const memo=document.getElementById('fMemo').value.trim();
+  // 儲存所有圖片到 IndexedDB
+  for(const fi of formImgs){ await idbSave(fi.id, fi.dataUrl); }
+  const images = formImgs.map(fi=>fi.id);
   if(!evs[mKey])evs[mKey]=[];
-  if(editIdx>=0)evs[mKey][editIdx]={title,loc,memo};
-  else evs[mKey].push({title,loc,memo});
+  if(editIdx>=0){
+    // 刪除移除掉的舊圖片
+    const old=(evs[mKey][editIdx].images||[]).filter(id=>!images.includes(id));
+    old.forEach(id=>idbDel(id));
+    evs[mKey][editIdx]={title,loc,memo,images};
+  } else {
+    evs[mKey].push({title,loc,memo,images});
+  }
   saveEv();resetForm();renderEvList();renderEvCell(mKey);
 }
+
 function delEv(i){
+  const e=evs[mKey][i];
+  // 刪除附屬圖片
+  if(e.images) e.images.forEach(id=>idbDel(id));
   evs[mKey].splice(i,1);
   if(!evs[mKey].length)delete evs[mKey];
   saveEv();if(editIdx===i)resetForm();renderEvList();renderEvCell(mKey);
 }
+
+// ── 圖片預覽 thumbnail ──
+function addThumb(id, dataUrl){
+  const row = document.getElementById('imgPreviewRow');
+  const wrap = document.createElement('div');
+  wrap.className='img-thumb-wrap'; wrap.dataset.id=id;
+  const img = document.createElement('img'); img.src=dataUrl;
+  img.addEventListener('click',()=>openLightbox(dataUrl));
+  const del = document.createElement('button');
+  del.className='img-thumb-del'; del.textContent='✕';
+  del.addEventListener('click',e=>{
+    e.stopPropagation();
+    formImgs=formImgs.filter(f=>f.id!==id);
+    wrap.remove();
+  });
+  wrap.appendChild(img); wrap.appendChild(del);
+  row.appendChild(wrap);
+}
+
+// ── 圖片處理：File → base64 ──
+function fileToBase64(file){
+  return new Promise(res=>{
+    const r=new FileReader();
+    r.onload=e=>res(e.target.result);
+    r.readAsDataURL(file);
+  });
+}
+async function addImgFile(file){
+  if(!file.type.startsWith('image/'))return;
+  const dataUrl=await fileToBase64(file);
+  const id='img_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+  formImgs.push({id,dataUrl});
+  addThumb(id,dataUrl);
+}
+
+// ── 上傳區事件 ──
+const dropZone=document.getElementById('imgDropZone');
+const fileInput=document.getElementById('imgFileInput');
+
+dropZone.addEventListener('click',()=>fileInput.click());
+fileInput.addEventListener('change',e=>{
+  [...e.target.files].forEach(addImgFile);
+  fileInput.value='';
+});
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  [...e.dataTransfer.files].forEach(addImgFile);
+});
+
+// ── 貼上圖片（Ctrl+V，在 Modal 開啟時有效）──
+document.addEventListener('paste',e=>{
+  if(!document.getElementById('modalBg').classList.contains('show'))return;
+  const items=[...(e.clipboardData?.items||[])];
+  items.filter(it=>it.type.startsWith('image/')).forEach(it=>{
+    const file=it.getAsFile();
+    if(file)addImgFile(file);
+  });
+});
+
+// ── 燈箱 ──
+function openLightbox(src){
+  document.getElementById('lightboxImg').src=src;
+  document.getElementById('lightboxBg').classList.add('show');
+  document.getElementById('lightboxDl').onclick=()=>{
+    const a=document.createElement('a');
+    a.href=src; a.download='圖片_'+Date.now()+'.png'; a.click();
+  };
+}
+document.getElementById('lightboxClose').addEventListener('click',()=>document.getElementById('lightboxBg').classList.remove('show'));
+document.getElementById('lightboxBg').addEventListener('click',e=>{if(e.target===document.getElementById('lightboxBg'))document.getElementById('lightboxBg').classList.remove('show');});
+
 document.getElementById('btnSave').addEventListener('click',saveEv2);
 document.getElementById('btnCancel').addEventListener('click',resetForm);
 document.getElementById('fTitle').addEventListener('keydown',e=>{if(e.key==='Enter')saveEv2();});
-document.getElementById('modalClose').addEventListener('click',()=>document.getElementById('modalBg').classList.remove('show'));
-document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))document.getElementById('modalBg').classList.remove('show');});
+document.getElementById('modalClose').addEventListener('click',()=>{document.getElementById('modalBg').classList.remove('show');resetForm();});
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg')){document.getElementById('modalBg').classList.remove('show');resetForm();}});
 
 // ══ 月曆導航 ══
 function go(dy,dm){curY+=dy;curM+=dm;if(curM>11){curM-=12;curY++;}if(curM<0){curM+=12;curY--;}renderCal();}
@@ -1001,8 +1284,10 @@ document.getElementById('syncModalBg').addEventListener('click', e => {
 });
 
 // ══ 初始化 ══
-renderCal();
-renderTodos();
+openIDB().then(()=>{
+  renderCal();
+  renderTodos();
+});
 </script>
 </body>
 </html>
