@@ -873,14 +873,14 @@ function idbDel(id) {
 // ══ 行程資料 ══
 const EV_KEY='calendar_events_v2';
 function loadEv(){try{const r=localStorage.getItem(EV_KEY);if(r)return JSON.parse(r);const o=localStorage.getItem('calendar_events_v1');if(o){const d=JSON.parse(o);const m={};for(const[k,a]of Object.entries(d))m[k]=a.map(s=>({title:s,loc:'',memo:''}));return m;}return{};}catch(e){return{};}}
-function saveEv(){localStorage.setItem(EV_KEY,JSON.stringify(evs));}
+function saveEv(){localStorage.setItem(EV_KEY,JSON.stringify(evs));if(typeof fbSaveEv==='function')fbSaveEv();}
 let evs=loadEv();
 
 // ══ 待辦資料 ══
 const TODO_KEY='todo_list_v1';
 let todos=[];
 try{todos=JSON.parse(localStorage.getItem(TODO_KEY))||[];}catch(e){}
-function saveTodos(){localStorage.setItem(TODO_KEY,JSON.stringify(todos));}
+function saveTodos(){localStorage.setItem(TODO_KEY,JSON.stringify(todos));if(typeof fbSaveTodos==='function')fbSaveTodos();}
 
 // ══ 時鐘 ══
 const now0=new Date();
@@ -1287,6 +1287,81 @@ document.getElementById('syncModalBg').addEventListener('click', e => {
 renderCal();
 renderTodos();
 openIDB().catch(e => console.warn('IndexedDB 無法開啟，圖片功能停用', e));
+</script>
+
+<!-- ══ Firebase 雲端同步 ══ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.1/firebase-database-compat.js"></script>
+<script>
+(function(){
+  const firebaseConfig = {
+    apiKey: "AIzaSyBkEKDFxro5r5FOZ5-7JFAraTi3ZzuhwcA",
+    authDomain: "my-calender-2f43b.firebaseapp.com",
+    databaseURL: "https://my-calender-2f43b-default-rtdb.firebaseio.com",
+    projectId: "my-calender-2f43b",
+    storageBucket: "my-calender-2f43b.firebasestorage.app",
+    messagingSenderId: "175299074052",
+    appId: "1:175299074052:web:54aba2841558e89bfefd51"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const REF = 'shared';
+  let ignoreRemote = false;
+
+  // 同步狀態顯示
+  const syncEl = document.createElement('div');
+  syncEl.style.cssText = 'position:fixed;bottom:6px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(100,220,100,0.75);z-index:9999;pointer-events:none;letter-spacing:1px;';
+  syncEl.textContent = '☁️ 連線中...';
+  document.body.appendChild(syncEl);
+  db.ref('.info/connected').on('value', s => {
+    syncEl.textContent = s.val() ? '☁️ 已同步' : '📴 離線';
+    syncEl.style.color = s.val() ? 'rgba(100,220,100,0.75)' : 'rgba(255,160,50,0.85)';
+  });
+
+  // 推送到 Firebase
+  window.fbSaveTodos = function(){
+    ignoreRemote = true;
+    db.ref(REF+'/todos').set(todos).then(()=>setTimeout(()=>{ignoreRemote=false;},1500)).catch(()=>{ignoreRemote=false;});
+  };
+  window.fbSaveEv = function(){
+    ignoreRemote = true;
+    db.ref(REF+'/evs').set(evs).then(()=>setTimeout(()=>{ignoreRemote=false;},1500)).catch(()=>{ignoreRemote=false;});
+  };
+
+  // 監聽遠端變動（其他裝置更新時自動同步）
+  db.ref(REF+'/todos').on('value', snap => {
+    if(ignoreRemote) return;
+    const d = snap.val();
+    if(d && JSON.stringify(d) !== JSON.stringify(todos)){
+      todos = d;
+      localStorage.setItem(TODO_KEY, JSON.stringify(todos));
+      renderTodos();
+    }
+  });
+  db.ref(REF+'/evs').on('value', snap => {
+    if(ignoreRemote) return;
+    const d = snap.val();
+    if(d && JSON.stringify(d) !== JSON.stringify(evs)){
+      evs = d;
+      localStorage.setItem(EV_KEY, JSON.stringify(evs));
+      renderCal();
+    }
+  });
+
+  // 首次載入：從 Firebase 取資料，若雲端無資料則上傳本地資料
+  db.ref(REF).once('value', snap => {
+    const d = snap.val();
+    if(!d){
+      if(todos.length) db.ref(REF+'/todos').set(todos);
+      if(Object.keys(evs).length) db.ref(REF+'/evs').set(evs);
+      return;
+    }
+    let changed = false;
+    if(d.todos){ todos=d.todos; localStorage.setItem(TODO_KEY,JSON.stringify(todos)); changed=true; }
+    if(d.evs){ evs=d.evs; localStorage.setItem(EV_KEY,JSON.stringify(evs)); changed=true; }
+    if(changed){ renderTodos(); renderCal(); }
+  });
+})();
 </script>
 </body>
 </html>
