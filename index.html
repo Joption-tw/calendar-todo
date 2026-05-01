@@ -345,6 +345,84 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .del-btn:hover { color: #ff6464; }
 .t-empty { text-align: center; color: rgba(255,255,255,0.28); font-size: 0.8rem; padding: 24px 0; }
 .todo-bottom { flex-shrink: 0; display: flex; flex-direction: column; gap: 5px; }
+
+/* ── 待辦圖片預覽條（新增時） ── */
+.todo-img-strip {
+  display: none;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  flex-shrink: 0;
+}
+.todo-img-strip.has-imgs { display: flex; }
+.todo-img-strip::-webkit-scrollbar { height: 3px; }
+.todo-img-strip::-webkit-scrollbar-thumb { background: rgba(100,200,255,0.2); border-radius: 2px; }
+.t-img-thumb {
+  position: relative;
+  width: 54px; height: 54px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  cursor: pointer;
+}
+.t-img-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+.t-img-thumb .tdel {
+  position: absolute; top:2px; right:2px;
+  background: rgba(0,0,0,0.65);
+  color: #ff9090; border: none;
+  border-radius: 50%; width:17px; height:17px;
+  font-size:0.6rem; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.t-img-thumb .tdel:hover { background:rgba(200,0,0,0.75); color:#fff; }
+
+/* ── 待辦列表內的圖片 ── */
+.t-imgs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+.t-img {
+  width: 58px; height: 58px;
+  object-fit: cover;
+  border-radius: 7px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.t-img:hover { transform: scale(1.06); }
+.t-img-add {
+  width: 58px; height: 58px;
+  border-radius: 7px;
+  border: 1.5px dashed rgba(100,200,255,0.35);
+  background: rgba(100,200,255,0.05);
+  color: rgba(100,200,255,0.5);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.t-img-add:hover { background:rgba(100,200,255,0.12); color:var(--accent); }
+
+/* 📷 上傳按鈕（新增列旁） */
+.cam-btn {
+  background: rgba(100,200,255,0.12);
+  border: 1px solid rgba(100,200,255,0.28);
+  color: rgba(100,200,255,0.7);
+  font-size: 1.15rem;
+  width: 34px; height: 34px;
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.cam-btn:hover { background:rgba(100,200,255,0.25); color:var(--accent); }
 .clear-btn {
   width: 100%;
   background: rgba(255,70,70,0.08);
@@ -891,6 +969,13 @@ body { display: flex; flex-direction: column; height: 100vh; }
   .sync-row { gap: 8px; }
   .sync-btn { font-size: 0.84rem; padding: 10px 0; border-radius: 10px; }
 
+  /* 待辦圖片 */
+  .cam-btn { width:48px; height:48px; font-size:1.35rem; border-radius:12px; }
+  .t-img { width:68px; height:68px; border-radius:9px; }
+  .t-img-add { width:68px; height:68px; border-radius:9px; font-size:1.6rem; }
+  .t-img-thumb { width:64px; height:64px; border-radius:9px; }
+  .t-imgs { gap: 7px; margin-top: 9px; }
+
   /* Modal 優化 */
   .modal {
     padding: 20px 16px 14px;
@@ -927,7 +1012,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
 
 <!-- 小工具標題列（窄視窗專用） -->
 <div class="widget-bar">
-  <div class="widget-bar-left">☑ 待辦事項 <span style="font-size:0.68rem;opacity:0.5;font-weight:normal;">網頁版 v2.1</span></div>
+  <div class="widget-bar-left">☑ 待辦事項 <span style="font-size:0.68rem;opacity:0.5;font-weight:normal;">網頁版 v2.2</span></div>
   <div class="widget-bar-right">
     <span class="badge" id="badge">0/0</span>
     <button class="icon-btn" id="fsBtn" title="全螢幕 (F11)">⛶</button>
@@ -936,7 +1021,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
 
 <!-- 完整標題列（寬視窗專用） -->
 <div class="full-header">
-  <h1>🗓 萬年曆 <span style="font-size:0.7rem;opacity:0.45;font-weight:normal;letter-spacing:1px;">網頁版 v2.1</span></h1>
+  <h1>🗓 萬年曆 <span style="font-size:0.7rem;opacity:0.45;font-weight:normal;letter-spacing:1px;">網頁版 v2.2</span></h1>
   <div class="clock" id="clock">00:00:00</div>
   <div class="date-info" id="dateInfo"></div>
 </div>
@@ -987,8 +1072,12 @@ body { display: flex; flex-direction: column; height: 100vh; }
     </div>
     <div class="add-row">
       <input id="todoInp" type="text" placeholder="新增待辦事項…" maxlength="80">
+      <button class="cam-btn" id="todoCamBtn" title="附加圖片">📷</button>
       <button class="add-btn" id="todoAddBtn">＋</button>
     </div>
+    <div class="todo-img-strip" id="todoImgStrip"></div>
+    <input type="file" id="todoImgInput" accept="image/*" multiple style="display:none">
+    <input type="file" id="todoItemImgInput" accept="image/*" multiple style="display:none">
     <div class="todo-list" id="todoList"></div>
     <div class="todo-bottom">
       <button class="clear-btn" id="clearBtn">🗑 清除已完成</button>
@@ -1437,12 +1526,52 @@ document.querySelectorAll('.pri-btn').forEach(b=>{
     b.classList.add('sel-'+tPri);
   });
 });
+// ── 待辦圖片暫存 ──
+let pendingTodoImgs = [];
+let todoItemImgTargetId = null; // 正在加圖的 todo id
+
+function refreshTodoImgStrip(){
+  const strip = document.getElementById('todoImgStrip');
+  strip.innerHTML = '';
+  if(pendingTodoImgs.length === 0){ strip.classList.remove('has-imgs'); return; }
+  strip.classList.add('has-imgs');
+  pendingTodoImgs.forEach((dataUrl, idx) => {
+    const wrap = document.createElement('div'); wrap.className='t-img-thumb';
+    const img = document.createElement('img'); img.src=dataUrl;
+    img.addEventListener('click', ()=>openLightbox(dataUrl));
+    const del = document.createElement('button'); del.className='tdel'; del.textContent='✕';
+    del.addEventListener('click', e=>{ e.stopPropagation(); pendingTodoImgs.splice(idx,1); refreshTodoImgStrip(); });
+    wrap.appendChild(img); wrap.appendChild(del); strip.appendChild(wrap);
+  });
+}
+
+// 📷 按鈕開啟選圖
+document.getElementById('todoCamBtn').addEventListener('click',()=>document.getElementById('todoImgInput').click());
+document.getElementById('todoImgInput').addEventListener('change', async e=>{
+  for(const f of e.target.files){
+    const d=await compressImg(f); if(d) pendingTodoImgs.push(d);
+  }
+  e.target.value=''; refreshTodoImgStrip();
+});
+
+// 替既有 todo 加圖
+document.getElementById('todoItemImgInput').addEventListener('change', async e=>{
+  const t=todos.find(x=>x.id===todoItemImgTargetId); if(!t) return;
+  if(!t.images) t.images=[];
+  for(const f of e.target.files){
+    const d=await compressImg(f); if(d) t.images.push(d);
+  }
+  e.target.value=''; saveTodos(); renderTodos();
+});
+
 function addTodo(){
   const inp=document.getElementById('todoInp');
   const text=inp.value.trim();
   if(!text)return;
-  todos.unshift({id:Date.now(),text,pri:tPri,done:false,created:new Date().toLocaleDateString('zh-TW')});
-  saveTodos();inp.value='';renderTodos();
+  const images=[...pendingTodoImgs];
+  todos.unshift({id:Date.now(),text,pri:tPri,done:false,created:new Date().toLocaleDateString('zh-TW'),images});
+  pendingTodoImgs=[]; refreshTodoImgStrip();
+  saveTodos(); inp.value=''; renderTodos();
 }
 document.getElementById('todoAddBtn').addEventListener('click',addTodo);
 document.getElementById('todoInp').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
@@ -1462,7 +1591,45 @@ function renderTodos(){
   show.forEach(t=>{
     const div=document.createElement('div');
     div.className=`t-item pri-${t.pri}${t.done?' done':''}`;
-    div.innerHTML=`<input type="checkbox" class="chk" ${t.done?'checked':''}><div class="t-body"><div class="t-text">${esc(t.text)}</div><div class="t-meta">${priLabel[t.pri]} · ${t.created||''}</div></div><button class="del-btn">✕</button>`;
+
+    // 圖片區
+    const imgs=t.images||[];
+    let imgsHtml='';
+    if(imgs.length||true){ // 永遠顯示加圖按鈕
+      imgsHtml=`<div class="t-imgs">
+        ${imgs.map(d=>`<img class="t-img" src="${d}" data-url="${d}">`).join('')}
+        <button class="t-img-add" data-tid="${t.id}" title="加入圖片">＋</button>
+      </div>`;
+    }
+
+    div.innerHTML=`
+      <input type="checkbox" class="chk" ${t.done?'checked':''}>
+      <div class="t-body">
+        <div class="t-text">${esc(t.text)}</div>
+        <div class="t-meta">${priLabel[t.pri]} · ${t.created||''}</div>
+        ${imgsHtml}
+      </div>
+      <button class="del-btn">✕</button>`;
+
+    // 點圖片開燈箱
+    div.querySelectorAll('.t-img').forEach(img=>{
+      img.addEventListener('click',()=>openLightbox(img.dataset.url));
+    });
+    // 加圖按鈕
+    div.querySelector('.t-img-add').addEventListener('click',()=>{
+      todoItemImgTargetId=t.id;
+      document.getElementById('todoItemImgInput').click();
+    });
+    // 長按圖片刪除
+    div.querySelectorAll('.t-img').forEach(img=>{
+      img.addEventListener('contextmenu', e=>{
+        e.preventDefault();
+        if(!confirm('刪除這張圖片？'))return;
+        const it=todos.find(x=>x.id===t.id);
+        if(it){ it.images=it.images.filter(d=>d!==img.dataset.url); saveTodos(); renderTodos(); }
+      });
+    });
+
     div.querySelector('.chk').addEventListener('change',()=>{const it=todos.find(x=>x.id===t.id);if(it){it.done=!it.done;saveTodos();renderTodos();}});
     div.querySelector('.del-btn').addEventListener('click',()=>{todos=todos.filter(x=>x.id!==t.id);saveTodos();renderTodos();});
     list.appendChild(div);
