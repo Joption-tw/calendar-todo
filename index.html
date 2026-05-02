@@ -157,6 +157,18 @@ body { display: flex; flex-direction: column; height: 100vh; }
   transition: all 0.2s;
 }
 .today-btn:hover { background: rgba(100,200,255,0.4); }
+
+/* 換月滑動動畫 */
+@keyframes calSlideNext {
+  from { opacity: 0.3; transform: translateX(28px); }
+  to   { opacity: 1;   transform: translateX(0); }
+}
+@keyframes calSlidePrev {
+  from { opacity: 0.3; transform: translateX(-28px); }
+  to   { opacity: 1;   transform: translateX(0); }
+}
+#calGrid.anim-next { animation: calSlideNext 0.2s cubic-bezier(0.25,0.8,0.25,1); }
+#calGrid.anim-prev { animation: calSlidePrev 0.2s cubic-bezier(0.25,0.8,0.25,1); }
 .grid-header {
   display: grid;
   grid-template-columns: repeat(7,1fr);
@@ -1063,9 +1075,9 @@ body { display: flex; flex-direction: column; height: 100vh; }
     border-radius: 8px;
   }
   .today-btn {
-    font-size: 0.88rem;
-    padding: 7px 16px;
-    border-radius: 22px;
+    font-size: 0.72rem;
+    padding: 4px 10px;
+    border-radius: 14px;
   }
   .grid-header span { font-size: 0.82rem; padding: 6px 0; }
 
@@ -1781,7 +1793,21 @@ document.getElementById('modalClose').addEventListener('click',()=>{document.get
 document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg')){document.getElementById('modalBg').classList.remove('show');resetForm();}});
 
 // ══ 月曆導航 ══
-function go(dy,dm){curY+=dy;curM+=dm;if(curM>11){curM-=12;curY++;}if(curM<0){curM+=12;curY--;}renderCal();}
+function go(dy,dm){
+  // 判斷方向（月）
+  const dir = dm > 0 ? 'next' : dm < 0 ? 'prev' : null;
+  curY+=dy; curM+=dm;
+  if(curM>11){curM-=12;curY++;}
+  if(curM<0){curM+=12;curY--;}
+  renderCal();
+  if(dir){
+    const grid = document.getElementById('calGrid');
+    grid.classList.remove('anim-next','anim-prev');
+    void grid.offsetWidth; // reflow 重置動畫
+    grid.classList.add('anim-'+dir);
+    grid.addEventListener('animationend',()=>grid.classList.remove('anim-next','anim-prev'),{once:true});
+  }
+}
 document.getElementById('prevYear')?.addEventListener('click',()=>go(-1,0));
 document.getElementById('nextYear')?.addEventListener('click',()=>go(1,0));
 document.getElementById('prevMonth')?.addEventListener('click',()=>go(0,-1));
