@@ -772,6 +772,90 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .me-cancel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #888; padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 0.88rem; font-family: inherit; }
 .me-cancel:hover { color: #fff; background: rgba(255,255,255,0.12); }
 
+/* ══ 互轉功能：通用轉換按鈕 ══ */
+.te-tocal {
+  background: rgba(80,200,120,0.15); border: 1px solid rgba(80,200,120,0.3);
+  color: rgba(100,220,140,0.9); padding: 9px 10px;
+  border-radius: 9px; cursor: pointer; font-size: 0.85rem; font-family: inherit;
+}
+.te-tocal:hover { background: rgba(80,200,120,0.3); }
+.me-todo {
+  background: rgba(80,200,120,0.15); border: 1px solid rgba(80,200,120,0.3);
+  color: rgba(100,220,140,0.9); padding: 9px 10px;
+  border-radius: 9px; cursor: pointer; font-size: 0.85rem; font-family: inherit;
+}
+.me-todo:hover { background: rgba(80,200,120,0.3); }
+.btn-to-memo {
+  background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.3);
+  color: #c4b5fd; padding: 4px 8px;
+  border-radius: 7px; cursor: pointer; font-size: 0.78rem; font-family: inherit;
+}
+.btn-to-memo:hover { background: rgba(167,139,250,0.4); }
+/* 轉行事曆：日期選擇列 */
+.te-tocal-row {
+  display: none; gap: 6px; align-items: center;
+  margin-bottom: 8px; flex-wrap: wrap;
+}
+.te-tocal-date {
+  flex: 1; min-width: 130px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18);
+  color: #e8f4ff; padding: 8px 10px; border-radius: 8px;
+  font-size: 0.88rem; font-family: inherit;
+}
+.te-tocal-date::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+.te-tocal-act { display: flex; gap: 5px; }
+.te-tocal-copy, .te-tocal-move {
+  padding: 7px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 0.82rem; font-family: inherit; white-space: nowrap;
+}
+.te-tocal-copy { background: rgba(80,200,120,0.2); border: 1px solid rgba(80,200,120,0.4); color: #90e890; }
+.te-tocal-copy:hover { background: rgba(80,200,120,0.4); }
+.te-tocal-move { background: rgba(255,160,60,0.2); border: 1px solid rgba(255,160,60,0.35); color: #ffb860; }
+.te-tocal-move:hover { background: rgba(255,160,60,0.4); }
+/* 轉換確認列（行事曆→備忘 卡片內用） */
+.ev-convert-row {
+  display: none; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.78rem; color: rgba(255,255,255,0.5);
+}
+.ev-convert-row.open { display: flex; }
+.ev-cv-copy, .ev-cv-move, .ev-cv-cancel {
+  padding: 4px 9px; border-radius: 7px; cursor: pointer;
+  font-size: 0.78rem; font-family: inherit;
+}
+.ev-cv-copy { background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.35); color: #c4b5fd; }
+.ev-cv-copy:hover { background: rgba(167,139,250,0.4); }
+.ev-cv-move { background: rgba(255,160,60,0.18); border: 1px solid rgba(255,160,60,0.3); color: #ffb860; }
+.ev-cv-move:hover { background: rgba(255,160,60,0.38); }
+.ev-cv-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: #666; }
+.ev-cv-cancel:hover { color: #aaa; }
+/* 備忘錄→待辦：確認列 */
+.me-todo-row {
+  display: none; gap: 6px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.me-todo-copy, .me-todo-move {
+  flex: 1; padding: 8px; border-radius: 9px; cursor: pointer;
+  font-size: 0.82rem; font-family: inherit; text-align: center;
+}
+.me-todo-copy { background: rgba(80,200,120,0.18); border: 1px solid rgba(80,200,120,0.35); color: #90e890; }
+.me-todo-copy:hover { background: rgba(80,200,120,0.35); }
+.me-todo-move { background: rgba(255,160,60,0.18); border: 1px solid rgba(255,160,60,0.3); color: #ffb860; }
+.me-todo-move:hover { background: rgba(255,160,60,0.35); }
+/* Toast */
+.toast-el {
+  position: fixed; bottom: 58px; left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: rgba(12,30,60,0.96); color: #a8e8ff;
+  border: 1px solid rgba(100,200,255,0.3);
+  padding: 9px 22px; border-radius: 22px;
+  font-size: 0.85rem; opacity: 0; pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s; z-index: 99999;
+  white-space: nowrap;
+}
+.toast-el.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
 /* 圖片燈箱 */
 .lightbox-bg {
   display: none;
@@ -1045,7 +1129,8 @@ body { display: flex; flex-direction: column; height: 100vh; }
   .todo-edit-modal { padding: 18px 14px; }
   .todo-edit-modal textarea { font-size: 1rem; padding: 12px; }
   .te-img-wrap { width:80px; height:80px; }
-  .te-save, .te-del, .te-cancel { font-size: 1rem; padding: 12px 10px; }
+  .te-save, .te-del, .te-cancel, .te-tocal { font-size: 0.9rem; padding: 11px 8px; }
+  .te-tocal-copy, .te-tocal-move { font-size: 0.88rem; padding: 9px 10px; }
   .todo-edit-add-img { font-size: 0.9rem; padding: 10px 16px; }
 
   /* 備忘錄面板（手機版） */
@@ -1059,7 +1144,10 @@ body { display: flex; flex-direction: column; height: 100vh; }
   .memo-item-preview { font-size: 0.82rem; }
   .memo-edit-modal { padding: 18px 14px; }
   .memo-edit-modal input, .memo-edit-modal textarea { font-size: 1rem; padding: 12px; }
-  .me-save, .me-del, .me-cancel { font-size: 1rem; padding: 12px 10px; }
+  .me-save, .me-del, .me-cancel, .me-todo { font-size: 0.9rem; padding: 11px 8px; }
+  .me-todo-copy, .me-todo-move { font-size: 0.88rem; padding: 10px; }
+  .todo-edit-btns { flex-wrap: wrap; }
+  .memo-edit-btns { flex-wrap: wrap; }
   .right-panel-tabs { display: none !important; }
 
   /* Modal 優化 */
@@ -1200,8 +1288,15 @@ body { display: flex; flex-direction: column; height: 100vh; }
     <input id="memoEditTitle" type="text" placeholder="標題（選填）" maxlength="60">
     <textarea id="memoEditContent" placeholder="備忘錄內容…" maxlength="2000" rows="7"></textarea>
     <div class="memo-edit-date" id="memoEditDate"></div>
+    <!-- 轉待辦確認列 -->
+    <div class="me-todo-row" id="meTodoRow">
+      <span style="font-size:0.8rem;color:rgba(255,255,255,0.45);width:100%">轉為待辦事項：</span>
+      <button class="me-todo-copy" id="meTodoCopy">📋 複製（保留備忘錄）</button>
+      <button class="me-todo-move" id="meTodoMove">✂️ 移動（刪除備忘錄）</button>
+    </div>
     <div class="memo-edit-btns">
       <button class="me-save" id="memoEditSave">💾 儲存</button>
+      <button class="me-todo" id="memoToTodo">☑ 轉待辦</button>
       <button class="me-del" id="memoEditDel">🗑 刪除</button>
       <button class="me-cancel" id="memoEditCancel">取消</button>
     </div>
@@ -1225,8 +1320,17 @@ body { display: flex; flex-direction: column; height: 100vh; }
     <div class="todo-edit-imgs" id="todoEditImgs"></div>
     <button class="todo-edit-add-img" id="todoEditAddImg">📷 新增圖片</button>
     <input type="file" id="todoEditImgInput" accept="image/*" multiple style="display:none">
+    <!-- 轉行事曆：日期選擇列 -->
+    <div class="te-tocal-row" id="teTocalRow">
+      <input type="date" id="teToCalDate" class="te-tocal-date">
+      <div class="te-tocal-act">
+        <button class="te-tocal-copy" id="teToCalCopy">📋 複製</button>
+        <button class="te-tocal-move" id="teToCalMove">✂️ 移動</button>
+      </div>
+    </div>
     <div class="todo-edit-btns">
       <button class="te-save" id="todoEditSave">💾 儲存</button>
+      <button class="te-tocal" id="todoToCal">📅 轉行事曆</button>
       <button class="te-del" id="todoEditDel">🗑 刪除</button>
       <button class="te-cancel" id="todoEditCancel">取消</button>
     </div>
@@ -1447,9 +1551,28 @@ function renderEvList(){
       ${e.loc?`<div class="ev-card-loc">📍 ${esc(e.loc)}</div>`:''}
       ${e.memo?`<div class="ev-card-memo">📝 ${esc(e.memo)}</div>`:''}
       <div class="ev-card-imgs" id="ci-${mKey}-${i}"></div>
-      <div class="ev-card-actions"><button class="btn-edit">編輯</button><button class="btn-del-ev">刪除</button></div>`;
+      <div class="ev-card-actions">
+        <button class="btn-edit">編輯</button>
+        <button class="btn-to-memo">📝 轉備忘</button>
+        <button class="btn-del-ev">刪除</button>
+      </div>
+      <div class="ev-convert-row" id="ecr-${mKey}-${i}">
+        <span>轉移至備忘錄：</span>
+        <button class="ev-cv-copy">📋 複製</button>
+        <button class="ev-cv-move">✂️ 移動（刪除行程）</button>
+        <button class="ev-cv-cancel">取消</button>
+      </div>`;
     card.querySelector('.btn-edit').addEventListener('click',()=>startEdit(i));
     card.querySelector('.btn-del-ev').addEventListener('click',()=>delEv(i));
+    card.querySelector('.btn-to-memo').addEventListener('click',()=>{
+      document.querySelectorAll('.ev-convert-row').forEach(r=>r.classList.remove('open'));
+      document.getElementById(`ecr-${mKey}-${i}`)?.classList.add('open');
+    });
+    card.querySelector('.ev-cv-copy').addEventListener('click',()=>{ evToMemo(i,false); });
+    card.querySelector('.ev-cv-move').addEventListener('click',()=>{ evToMemo(i,true); });
+    card.querySelector('.ev-cv-cancel').addEventListener('click',()=>{
+      document.getElementById(`ecr-${mKey}-${i}`)?.classList.remove('open');
+    });
     list.appendChild(card);
     // 載入圖片（base64 直接顯示）
     if(e.images && e.images.length){
@@ -1762,6 +1885,7 @@ function openTodoEdit(id) {
   todoEditId = id;
   document.getElementById('todoEditText').value = t.text;
   renderTodoEditImgs(t);
+  document.getElementById('teTocalRow').style.display = 'none';
   document.getElementById('todoEditBg').classList.add('show');
   setTimeout(() => document.getElementById('todoEditText').focus(), 50);
 }
@@ -1810,6 +1934,7 @@ document.getElementById('todoEditSave').addEventListener('click', () => {
   t.text = newText;
   saveTodos(); renderTodos();
   document.getElementById('todoEditBg').classList.remove('show');
+  document.getElementById('teTocalRow').style.display = 'none';
   todoEditId = null;
 });
 
@@ -1818,19 +1943,117 @@ document.getElementById('todoEditDel').addEventListener('click', () => {
   todos = todos.filter(x => x.id !== todoEditId);
   saveTodos(); renderTodos();
   document.getElementById('todoEditBg').classList.remove('show');
+  document.getElementById('teTocalRow').style.display = 'none';
   todoEditId = null;
 });
 
 document.getElementById('todoEditCancel').addEventListener('click', () => {
   document.getElementById('todoEditBg').classList.remove('show');
+  document.getElementById('teTocalRow').style.display = 'none';
   todoEditId = null;
 });
 document.getElementById('todoEditBg').addEventListener('click', e => {
   if (e.target === document.getElementById('todoEditBg')) {
     document.getElementById('todoEditBg').classList.remove('show');
+    document.getElementById('teTocalRow').style.display = 'none';
     todoEditId = null;
   }
 });
+
+// ══ Toast 提示 ══
+let _toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toastEl');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ══ 行事曆 → 備忘錄 ══
+function evToMemo(idx, deleteSource) {
+  const e = evs[mKey]?.[idx];
+  if (!e) return;
+  const parts = ['📅 ' + mKey];
+  if (e.loc)  parts.push('📍 ' + e.loc);
+  if (e.memo) parts.push(e.memo);
+  const now = new Date().toLocaleDateString('zh-TW');
+  memos.unshift({ id: Date.now(), title: e.title, content: parts.join('\n'), created: now, updated: now });
+  saveMemos(); renderMemos();
+  if (deleteSource) {
+    delEv(idx);
+    showToast('✅ 已移動至備忘錄（行程已刪除）');
+  } else {
+    document.querySelectorAll('.ev-convert-row').forEach(r => r.classList.remove('open'));
+    showToast('✅ 已複製至備忘錄');
+  }
+}
+
+// ══ 待辦 → 行事曆 ══
+document.getElementById('todoToCal').addEventListener('click', () => {
+  const row = document.getElementById('teTocalRow');
+  const open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : 'flex';
+  if (!open) {
+    const today = new Date();
+    const iso = today.getFullYear() + '-' +
+      String(today.getMonth()+1).padStart(2,'0') + '-' +
+      String(today.getDate()).padStart(2,'0');
+    document.getElementById('teToCalDate').value = iso;
+    document.getElementById('teToCalDate').focus();
+  }
+});
+function doTodoToCal(deleteSource) {
+  const dateVal = document.getElementById('teToCalDate').value;
+  if (!dateVal) { showToast('請先選擇日期'); return; }
+  const t = todos.find(x => x.id === todoEditId);
+  if (!t) return;
+  if (!evs[dateVal]) evs[dateVal] = [];
+  evs[dateVal].push({ title: t.text, loc: '', memo: '', images: [] });
+  saveEv(); renderCal();
+  if (deleteSource) {
+    todos = todos.filter(x => x.id !== todoEditId);
+    saveTodos(); renderTodos();
+    document.getElementById('todoEditBg').classList.remove('show');
+    document.getElementById('teTocalRow').style.display = 'none';
+    todoEditId = null;
+    showToast('✅ 已移動至 ' + dateVal.replace(/-/g,'/') + ' 行事曆');
+  } else {
+    document.getElementById('teTocalRow').style.display = 'none';
+    showToast('✅ 已複製至 ' + dateVal.replace(/-/g,'/') + ' 行事曆');
+  }
+}
+document.getElementById('teToCalCopy').addEventListener('click', () => doTodoToCal(false));
+document.getElementById('teToCalMove').addEventListener('click', () => doTodoToCal(true));
+
+// ══ 備忘錄 → 待辦 ══
+document.getElementById('memoToTodo').addEventListener('click', () => {
+  const row = document.getElementById('meTodoRow');
+  const open = row.style.display !== 'none';
+  row.style.display = open ? 'none' : 'flex';
+});
+function doMemoToTodo(deleteSource) {
+  const m = memos.find(x => x.id === memoEditId);
+  if (!m) return;
+  const text = (m.title || m.content || '').slice(0, 100).trim();
+  if (!text) { showToast('內容為空，無法轉換'); return; }
+  todos.unshift({ id: Date.now(), text, pri: 'mid', done: false, created: new Date().toLocaleDateString('zh-TW'), images: [] });
+  saveTodos(); renderTodos();
+  if (deleteSource) {
+    memos = memos.filter(x => x.id !== memoEditId);
+    saveMemos(); renderMemos();
+    document.getElementById('memoEditBg').classList.remove('show');
+    document.getElementById('meTodoRow').style.display = 'none';
+    memoEditId = null;
+    showToast('✅ 已移動至待辦事項（備忘錄已刪除）');
+  } else {
+    document.getElementById('meTodoRow').style.display = 'none';
+    showToast('✅ 已複製至待辦事項');
+  }
+}
+document.getElementById('meTodoCopy').addEventListener('click', () => doMemoToTodo(false));
+document.getElementById('meTodoMove').addEventListener('click', () => doMemoToTodo(true));
 window.addEventListener('storage',e=>{
   if(e.key===TODO_KEY){try{todos=JSON.parse(e.newValue)||[];}catch(x){}renderTodos();}
   if(e.key===EV_KEY){try{evs=JSON.parse(e.newValue)||{};}catch(x){}renderCal();}
@@ -1931,6 +2154,7 @@ document.getElementById('memoEditSave').addEventListener('click', () => {
   m.updated = new Date().toLocaleDateString('zh-TW');
   saveMemos(); renderMemos();
   document.getElementById('memoEditBg').classList.remove('show');
+  document.getElementById('meTodoRow').style.display = 'none';
   memoEditId = null;
 });
 document.getElementById('memoEditDel').addEventListener('click', () => {
@@ -1938,15 +2162,18 @@ document.getElementById('memoEditDel').addEventListener('click', () => {
   memos = memos.filter(x => x.id !== memoEditId);
   saveMemos(); renderMemos();
   document.getElementById('memoEditBg').classList.remove('show');
+  document.getElementById('meTodoRow').style.display = 'none';
   memoEditId = null;
 });
 document.getElementById('memoEditCancel').addEventListener('click', () => {
   document.getElementById('memoEditBg').classList.remove('show');
+  document.getElementById('meTodoRow').style.display = 'none';
   memoEditId = null;
 });
 document.getElementById('memoEditBg').addEventListener('click', e => {
   if (e.target === document.getElementById('memoEditBg')) {
     document.getElementById('memoEditBg').classList.remove('show');
+    document.getElementById('meTodoRow').style.display = 'none';
     memoEditId = null;
   }
 });
@@ -2069,5 +2296,6 @@ if (window.innerWidth < 520) switchMobTab('todo');
   });
 })();
 </script>
+<div id="toastEl" class="toast-el"></div>
 </body>
 </html>
