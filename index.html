@@ -688,6 +688,90 @@ body { display: flex; flex-direction: column; height: 100vh; }
 }
 .ev-card-img:hover { transform: scale(1.05); }
 
+/* ══ 備忘錄面板 ══ */
+.memo-panel {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 10px 12px;
+  gap: 8px;
+}
+.memo-add-area { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+.memo-add-area input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(167,139,250,0.25);
+  color: #fff; padding: 7px 10px;
+  border-radius: 8px; font-size: 0.84rem;
+  outline: none; font-family: inherit;
+}
+.memo-add-area input:focus { border-color: rgba(167,139,250,0.55); }
+.memo-add-area input::placeholder { color: rgba(255,255,255,0.28); }
+.memo-add-area textarea {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(167,139,250,0.25);
+  color: #fff; padding: 8px 10px;
+  border-radius: 8px; font-size: 0.84rem;
+  outline: none; font-family: inherit;
+  resize: vertical; min-height: 70px;
+}
+.memo-add-area textarea:focus { border-color: rgba(167,139,250,0.55); }
+.memo-add-area textarea::placeholder { color: rgba(255,255,255,0.28); }
+.memo-add-btn {
+  background: rgba(167,139,250,0.2);
+  border: 1px solid rgba(167,139,250,0.4);
+  color: #c4b5fd; font-size: 0.84rem;
+  padding: 8px; border-radius: 8px;
+  cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.memo-add-btn:hover { background: rgba(167,139,250,0.35); color: #ddd6fe; }
+.memo-list {
+  flex: 1; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 6px; padding-right: 2px;
+}
+.memo-list::-webkit-scrollbar { width: 4px; }
+.memo-list::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.25); border-radius: 2px; }
+.memo-item {
+  padding: 10px 12px;
+  background: rgba(167,139,250,0.06);
+  border-radius: 9px;
+  border-left: 3px solid rgba(167,139,250,0.4);
+  cursor: pointer; transition: all 0.15s;
+}
+.memo-item:hover { background: rgba(167,139,250,0.14); }
+.memo-item-title { font-size: 0.88rem; font-weight: bold; color: #ddd6fe; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.memo-item-preview { font-size: 0.75rem; color: rgba(255,255,255,0.45); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.memo-item-date { font-size: 0.63rem; color: rgba(255,255,255,0.25); margin-top: 4px; }
+.memo-empty { text-align: center; color: rgba(255,255,255,0.28); font-size: 0.8rem; padding: 24px 0; }
+/* ══ 備忘錄編輯 Modal ══ */
+.memo-edit-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 300; align-items: center; justify-content: center; }
+.memo-edit-bg.show { display: flex; }
+.memo-edit-modal {
+  background: rgba(12,22,52,0.97);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(167,139,250,0.25);
+  border-radius: 16px; padding: 20px 18px;
+  width: 400px; max-width: 96vw; max-height: 88vh;
+  overflow-y: auto; box-shadow: 0 16px 48px rgba(0,0,0,0.65);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.memo-edit-modal h3 { font-size: 0.95rem; color: #c4b5fd; }
+.memo-edit-modal input { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(167,139,250,0.3); color: #fff; padding: 9px 12px; border-radius: 9px; font-size: 0.9rem; font-family: inherit; outline: none; }
+.memo-edit-modal input:focus { border-color: rgba(167,139,250,0.6); }
+.memo-edit-modal input::placeholder { color: rgba(255,255,255,0.28); }
+.memo-edit-modal textarea { width: 100%; background: rgba(255,255,255,0.08); border: 1px solid rgba(167,139,250,0.3); color: #fff; padding: 10px 12px; border-radius: 9px; font-size: 0.88rem; font-family: inherit; resize: vertical; min-height: 140px; outline: none; line-height: 1.6; }
+.memo-edit-modal textarea:focus { border-color: rgba(167,139,250,0.6); }
+.memo-edit-modal textarea::placeholder { color: rgba(255,255,255,0.28); }
+.memo-edit-date { font-size: 0.65rem; color: rgba(255,255,255,0.28); }
+.memo-edit-btns { display: flex; gap: 7px; }
+.me-save { flex: 1; background: rgba(167,139,250,0.22); border: 1px solid rgba(167,139,250,0.4); color: #c4b5fd; padding: 9px; border-radius: 9px; cursor: pointer; font-size: 0.88rem; font-family: inherit; }
+.me-save:hover { background: rgba(167,139,250,0.4); }
+.me-del { background: rgba(255,70,70,0.1); border: 1px solid rgba(255,70,70,0.28); color: rgba(255,120,120,0.85); padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 0.88rem; font-family: inherit; }
+.me-del:hover { background: rgba(255,70,70,0.25); color: #ff9090; }
+.me-cancel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #888; padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 0.88rem; font-family: inherit; }
+.me-cancel:hover { color: #fff; background: rgba(255,255,255,0.12); }
+
 /* 圖片燈箱 */
 .lightbox-bg {
   display: none;
@@ -810,6 +894,11 @@ body { display: flex; flex-direction: column; height: 100vh; }
     overflow-y: auto;
     height: 100%;
   }
+  .right-panel-tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; margin: -16px -14px 10px; }
+  .right-panel-tab { flex: 1; padding: 9px 0; background: none; border: none; border-bottom: 2px solid transparent; color: rgba(255,255,255,0.4); font-size: 0.8rem; font-family: inherit; cursor: pointer; transition: all 0.15s; }
+  .right-panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(100,200,255,0.06); }
+  .memo-panel { display: none; flex-direction: column; width: 300px; flex-shrink: 0; border-left: 1px solid var(--border); padding: 52px 14px 14px; overflow-y: auto; height: 100%; }
+  .memo-panel.desktop-show { display: flex; }
 }
 
 /* ══ 手機版（<520px）完整覆寫 ══ */
@@ -959,6 +1048,20 @@ body { display: flex; flex-direction: column; height: 100vh; }
   .te-save, .te-del, .te-cancel { font-size: 1rem; padding: 12px 10px; }
   .todo-edit-add-img { font-size: 0.9rem; padding: 10px 16px; }
 
+  /* 備忘錄面板（手機版） */
+  .memo-panel { display: none; flex: 1; flex-direction: column; width: 100%; overflow: hidden; padding: 12px 12px 8px; gap: 10px; }
+  .memo-panel.mob-show { display: flex; }
+  .memo-add-area input { font-size: 1rem; padding: 10px 12px; border-radius: 10px; height: 42px; }
+  .memo-add-area textarea { font-size: 1rem; padding: 10px 12px; border-radius: 10px; min-height: 90px; }
+  .memo-add-btn { font-size: 0.92rem; padding: 11px; border-radius: 11px; }
+  .memo-item { padding: 12px 14px; border-radius: 12px; }
+  .memo-item-title { font-size: 0.98rem; }
+  .memo-item-preview { font-size: 0.82rem; }
+  .memo-edit-modal { padding: 18px 14px; }
+  .memo-edit-modal input, .memo-edit-modal textarea { font-size: 1rem; padding: 12px; }
+  .me-save, .me-del, .me-cancel { font-size: 1rem; padding: 12px 10px; }
+  .right-panel-tabs { display: none !important; }
+
   /* Modal 優化 */
   .modal {
     padding: 20px 16px 14px;
@@ -1043,6 +1146,10 @@ body { display: flex; flex-direction: column; height: 100vh; }
 
   <!-- 待辦清單 -->
   <div class="todo-panel">
+    <div class="right-panel-tabs" id="rightPanelTabs">
+      <button class="right-panel-tab active" data-rp="todo">☑ 待辦事項</button>
+      <button class="right-panel-tab" data-rp="memo">📝 備忘錄</button>
+    </div>
     <div class="tabs">
       <button class="tab active" data-f="all">全部</button>
       <button class="tab" data-f="pending">待辦</button>
@@ -1061,6 +1168,16 @@ body { display: flex; flex-direction: column; height: 100vh; }
       <div class="dt-bar" id="dtBar"></div>
     </div>
   </div>
+
+  <!-- 備忘錄面板 -->
+  <div class="memo-panel" id="memoPanel">
+    <div class="memo-add-area">
+      <input id="memoTitleInp" type="text" placeholder="標題（選填）" maxlength="60">
+      <textarea id="memoContentInp" placeholder="備忘錄內容… Ctrl+Enter 新增" maxlength="2000" rows="3"></textarea>
+      <button class="memo-add-btn" id="memoAddBtn">＋ 新增備忘錄</button>
+    </div>
+    <div class="memo-list" id="memoList"></div>
+  </div>
 </div>
 
 <!-- 手機版底部 Tab Bar -->
@@ -1071,6 +1188,24 @@ body { display: flex; flex-direction: column; height: 100vh; }
   <button class="mob-tab active" data-mob="todo">
     <span class="ti">✅</span>待辦事項
   </button>
+  <button class="mob-tab" data-mob="memo">
+    <span class="ti">📝</span>備忘錄
+  </button>
+</div>
+
+<!-- 備忘錄編輯 Modal -->
+<div class="memo-edit-bg" id="memoEditBg">
+  <div class="memo-edit-modal">
+    <h3>📝 編輯備忘錄</h3>
+    <input id="memoEditTitle" type="text" placeholder="標題（選填）" maxlength="60">
+    <textarea id="memoEditContent" placeholder="備忘錄內容…" maxlength="2000" rows="7"></textarea>
+    <div class="memo-edit-date" id="memoEditDate"></div>
+    <div class="memo-edit-btns">
+      <button class="me-save" id="memoEditSave">💾 儲存</button>
+      <button class="me-del" id="memoEditDel">🗑 刪除</button>
+      <button class="me-cancel" id="memoEditCancel">取消</button>
+    </div>
+  </div>
 </div>
 
 <!-- 圖片燈箱 -->
@@ -1202,6 +1337,15 @@ const TODO_KEY='todo_list_v1';
 let todos=[];
 try{todos=JSON.parse(localStorage.getItem(TODO_KEY))||[];}catch(e){}
 function saveTodos(){localStorage.setItem(TODO_KEY,JSON.stringify(todos));if(typeof fbSaveTodos==='function')fbSaveTodos();}
+
+// ══ 備忘錄資料 ══
+const MEMO_KEY = 'memo_list_v1';
+let memos = [];
+try { memos = JSON.parse(localStorage.getItem(MEMO_KEY)) || []; } catch(e) {}
+function saveMemos() {
+  localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+  if (typeof fbSaveMemos === 'function') fbSaveMemos();
+}
 
 // ══ 時鐘 ══
 const now0=new Date();
@@ -1677,26 +1821,130 @@ document.addEventListener('fullscreenchange',()=>{
 
 // ══ 手機版 Tab 切換 ══
 function switchMobTab(tab) {
-  const cal = document.querySelector('.calendar-wrapper');
+  const cal  = document.querySelector('.calendar-wrapper');
   const todo = document.querySelector('.todo-panel');
-  if (tab === 'cal') {
-    cal.classList.remove('mob-hidden');
-    todo.classList.remove('mob-show');
-  } else {
-    cal.classList.add('mob-hidden');
-    todo.classList.add('mob-show');
-  }
-  document.querySelectorAll('.mob-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.mob === tab);
-  });
+  const memo = document.getElementById('memoPanel');
+  if (cal)  cal.classList.add('mob-hidden');
+  if (todo) todo.classList.remove('mob-show');
+  if (memo) memo.classList.remove('mob-show');
+  if (tab === 'cal'  && cal)  cal.classList.remove('mob-hidden');
+  if (tab === 'todo' && todo) todo.classList.add('mob-show');
+  if (tab === 'memo' && memo) memo.classList.add('mob-show');
+  document.querySelectorAll('.mob-tab').forEach(t => t.classList.toggle('active', t.dataset.mob === tab));
 }
 document.querySelectorAll('.mob-tab').forEach(t => {
   t.addEventListener('click', () => switchMobTab(t.dataset.mob));
 });
 
+// ══ 備忘錄 ══
+let memoEditId = null;
+
+function renderMemos() {
+  const list = document.getElementById('memoList');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!memos.length) {
+    list.innerHTML = '<div class="memo-empty">尚無備忘錄，點上方新增 📝</div>';
+    return;
+  }
+  memos.forEach(m => {
+    const div = document.createElement('div');
+    div.className = 'memo-item';
+    const preview = (m.content || '').replace(/\n/g, ' ').slice(0, 80);
+    const hasMore = (m.content || '').length > 80;
+    div.innerHTML = `
+      <div class="memo-item-title">${esc(m.title || '（無標題）')}</div>
+      ${preview ? `<div class="memo-item-preview">${esc(preview)}${hasMore ? '…' : ''}</div>` : ''}
+      <div class="memo-item-date">${m.updated || m.created || ''}</div>`;
+    div.addEventListener('click', () => openMemoEdit(m.id));
+    list.appendChild(div);
+  });
+}
+
+function addMemo() {
+  const titleEl = document.getElementById('memoTitleInp');
+  const contentEl = document.getElementById('memoContentInp');
+  if (!titleEl || !contentEl) return;
+  const title = titleEl.value.trim();
+  const content = contentEl.value.trim();
+  if (!title && !content) return;
+  const now = new Date().toLocaleDateString('zh-TW');
+  memos.unshift({ id: Date.now(), title, content, created: now, updated: now });
+  titleEl.value = ''; contentEl.value = '';
+  saveMemos(); renderMemos();
+}
+
+function openMemoEdit(id) {
+  const m = memos.find(x => x.id === id);
+  if (!m) return;
+  memoEditId = id;
+  document.getElementById('memoEditTitle').value = m.title || '';
+  document.getElementById('memoEditContent').value = m.content || '';
+  const dateEl = document.getElementById('memoEditDate');
+  if (dateEl) dateEl.textContent = `建立：${m.created || ''}　更新：${m.updated || ''}`;
+  document.getElementById('memoEditBg').classList.add('show');
+  setTimeout(() => document.getElementById('memoEditContent').focus(), 50);
+}
+
+document.getElementById('memoAddBtn').addEventListener('click', addMemo);
+document.getElementById('memoContentInp').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) addMemo();
+});
+document.getElementById('memoTitleInp').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('memoContentInp').focus();
+});
+document.getElementById('memoEditSave').addEventListener('click', () => {
+  const m = memos.find(x => x.id === memoEditId);
+  if (!m) return;
+  m.title = document.getElementById('memoEditTitle').value.trim();
+  m.content = document.getElementById('memoEditContent').value.trim();
+  m.updated = new Date().toLocaleDateString('zh-TW');
+  saveMemos(); renderMemos();
+  document.getElementById('memoEditBg').classList.remove('show');
+  memoEditId = null;
+});
+document.getElementById('memoEditDel').addEventListener('click', () => {
+  if (!confirm('確定刪除此備忘錄？')) return;
+  memos = memos.filter(x => x.id !== memoEditId);
+  saveMemos(); renderMemos();
+  document.getElementById('memoEditBg').classList.remove('show');
+  memoEditId = null;
+});
+document.getElementById('memoEditCancel').addEventListener('click', () => {
+  document.getElementById('memoEditBg').classList.remove('show');
+  memoEditId = null;
+});
+document.getElementById('memoEditBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('memoEditBg')) {
+    document.getElementById('memoEditBg').classList.remove('show');
+    memoEditId = null;
+  }
+});
+
+// ══ 寬螢幕右側面板切換 ══
+function switchRightPanel(panel) {
+  const todo = document.querySelector('.todo-panel');
+  const memo = document.getElementById('memoPanel');
+  if (panel === 'todo') {
+    if (todo) { todo.style.display = ''; }
+    if (memo) memo.classList.remove('desktop-show');
+  } else {
+    if (todo) todo.style.display = 'none';
+    if (memo) memo.classList.add('desktop-show');
+  }
+  document.querySelectorAll('.right-panel-tab').forEach(t => t.classList.toggle('active', t.dataset.rp === panel));
+}
+const rightPanelTabsEl = document.getElementById('rightPanelTabs');
+if (rightPanelTabsEl) {
+  rightPanelTabsEl.querySelectorAll('.right-panel-tab').forEach(t => {
+    t.addEventListener('click', () => switchRightPanel(t.dataset.rp));
+  });
+}
+
 // ══ 初始化 ══
 renderCal();
 renderTodos();
+renderMemos();
 openIDB().catch(e => console.warn('IndexedDB 無法開啟，圖片功能停用', e));
 // 手機預設顯示待辦事項 tab
 if (window.innerWidth < 520) switchMobTab('todo');
@@ -1740,6 +1988,10 @@ if (window.innerWidth < 520) switchMobTab('todo');
     ignoreRemote = true;
     db.ref(REF+'/evs').set(evs).then(()=>setTimeout(()=>{ignoreRemote=false;},1500)).catch(()=>{ignoreRemote=false;});
   };
+  window.fbSaveMemos = function(){
+    ignoreRemote = true;
+    db.ref(REF+'/memos').set(memos).then(()=>setTimeout(()=>{ignoreRemote=false;},1500)).catch(()=>{ignoreRemote=false;});
+  };
 
   // 監聽遠端變動（其他裝置更新時自動同步）
   db.ref(REF+'/todos').on('value', snap => {
@@ -1760,6 +2012,15 @@ if (window.innerWidth < 520) switchMobTab('todo');
       renderCal();
     }
   });
+  db.ref(REF+'/memos').on('value', snap => {
+    if(ignoreRemote) return;
+    const d = snap.val();
+    if(d && JSON.stringify(d) !== JSON.stringify(memos)){
+      memos = d;
+      localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+      renderMemos();
+    }
+  });
 
   // 首次載入：從 Firebase 取資料，若雲端無資料則上傳本地資料
   db.ref(REF).once('value', snap => {
@@ -1767,12 +2028,14 @@ if (window.innerWidth < 520) switchMobTab('todo');
     if(!d){
       if(todos.length) db.ref(REF+'/todos').set(todos);
       if(Object.keys(evs).length) db.ref(REF+'/evs').set(evs);
+      if(memos.length) db.ref(REF+'/memos').set(memos);
       return;
     }
     let changed = false;
     if(d.todos){ todos=d.todos; localStorage.setItem(TODO_KEY,JSON.stringify(todos)); changed=true; }
     if(d.evs){ evs=d.evs; localStorage.setItem(EV_KEY,JSON.stringify(evs)); changed=true; }
-    if(changed){ renderTodos(); renderCal(); }
+    if(d.memos){ memos=d.memos; localStorage.setItem(MEMO_KEY,JSON.stringify(memos)); changed=true; }
+    if(changed){ renderTodos(); renderCal(); renderMemos(); }
   });
 })();
 </script>
