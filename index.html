@@ -1195,6 +1195,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
   <div class="mob-header-right">
     <div class="mob-date" id="mobDate"></div>
     <span class="mob-badge" id="mobBadge">待辦 0/0</span>
+    <span id="syncDot" style="font-size:0.75rem;color:rgba(100,220,100,0.7);margin-left:4px;" title="同步中">☁</span>
   </div>
 </div>
 
@@ -1288,7 +1289,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
     <span class="ti">📅</span>行事曆
   </button>
   <button class="mob-tab active" data-mob="todo">
-    <span class="ti">✅</span>待辦事項
+    <span class="ti">✅</span>待辦
   </button>
   <button class="mob-tab" data-mob="memo">
     <span class="ti">📝</span>備忘錄
@@ -2380,13 +2381,14 @@ if (window.innerWidth < 520) switchMobTab('todo');
   let ignoreRemote = false;
 
   // 同步狀態顯示
-  const syncEl = document.createElement('div');
-  syncEl.style.cssText = 'position:fixed;bottom:6px;left:50%;transform:translateX(-50%);font-size:11px;color:rgba(100,220,100,0.75);z-index:9999;pointer-events:none;letter-spacing:1px;';
-  syncEl.textContent = '☁️ 連線中...';
-  document.body.appendChild(syncEl);
+  // 同步狀態：顯示在 widget-bar 右側小圓點，不擋 Tab Bar
+  const syncDot = document.getElementById('syncDot');
   db.ref('.info/connected').on('value', s => {
-    syncEl.textContent = s.val() ? '☁️ 已同步' : '📴 離線';
-    syncEl.style.color = s.val() ? 'rgba(100,220,100,0.75)' : 'rgba(255,160,50,0.85)';
+    if (syncDot) {
+      syncDot.textContent = s.val() ? '☁' : '📴';
+      syncDot.title = s.val() ? '已同步' : '離線';
+      syncDot.style.color = s.val() ? 'rgba(100,220,100,0.85)' : 'rgba(255,160,50,0.9)';
+    }
   });
 
   // 推送到 Firebase
