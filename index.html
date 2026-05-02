@@ -772,77 +772,81 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .me-cancel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #888; padding: 9px 12px; border-radius: 9px; cursor: pointer; font-size: 0.88rem; font-family: inherit; }
 .me-cancel:hover { color: #fff; background: rgba(255,255,255,0.12); }
 
-/* ══ 互轉功能：通用轉換按鈕 ══ */
-.te-tocal {
-  background: rgba(80,200,120,0.15); border: 1px solid rgba(80,200,120,0.3);
-  color: rgba(100,220,140,0.9); padding: 9px 10px;
-  border-radius: 9px; cursor: pointer; font-size: 0.85rem; font-family: inherit;
+/* ══ 通用轉換 UI ══ */
+.cv-section {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin-top: 10px; padding-top: 6px;
 }
-.te-tocal:hover { background: rgba(80,200,120,0.3); }
-.me-todo {
-  background: rgba(80,200,120,0.15); border: 1px solid rgba(80,200,120,0.3);
-  color: rgba(100,220,140,0.9); padding: 9px 10px;
-  border-radius: 9px; cursor: pointer; font-size: 0.85rem; font-family: inherit;
+.cv-header {
+  font-size: 0.82rem; color: rgba(100,200,255,0.65);
+  cursor: pointer; padding: 6px 2px;
+  display: flex; align-items: center;
+  user-select: none; border-radius: 6px;
+  transition: color 0.15s;
 }
-.me-todo:hover { background: rgba(80,200,120,0.3); }
-.btn-to-memo {
-  background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.3);
-  color: #c4b5fd; padding: 4px 8px;
+.cv-header::after { content: ' ▾'; margin-left: auto; }
+.cv-header.open { color: rgba(100,200,255,0.9); }
+.cv-header.open::after { content: ' ▴'; }
+.cv-body { display: none; padding-top: 6px; }
+.cv-body.open { display: block; }
+.cv-dest-row { display: flex; gap: 8px; margin-bottom: 6px; }
+.cv-dest-btn, .ev-cv-dest {
+  flex: 1; background: rgba(100,200,255,0.1);
+  border: 1px solid rgba(100,200,255,0.22);
+  color: rgba(180,225,255,0.8); padding: 8px 6px;
+  border-radius: 9px; cursor: pointer;
+  font-size: 0.84rem; font-family: inherit; text-align: center;
+  transition: all 0.15s;
+}
+.cv-dest-btn:hover, .cv-dest-btn.active,
+.ev-cv-dest:hover, .ev-cv-dest.active {
+  background: rgba(100,200,255,0.25); color: var(--accent);
+  border-color: rgba(100,200,255,0.4);
+}
+.cv-sub-row {
+  display: none; gap: 6px; align-items: center;
+  flex-wrap: wrap; padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 9px; margin-bottom: 4px;
+}
+.cv-sub-row.open { display: flex; }
+.cv-sub-label {
+  font-size: 0.75rem; color: rgba(255,255,255,0.4);
+  width: 100%; margin-bottom: 2px;
+}
+.cv-date-input {
+  flex: 1; min-width: 120px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #e8f4ff; padding: 7px 10px;
+  border-radius: 8px; font-size: 0.85rem; font-family: inherit;
+}
+.cv-date-input::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+.cv-copy-btn {
+  padding: 7px 11px; border-radius: 8px; cursor: pointer;
+  font-size: 0.82rem; font-family: inherit;
+  background: rgba(80,200,120,0.18); border: 1px solid rgba(80,200,120,0.35); color: #90e890;
+}
+.cv-copy-btn:hover { background: rgba(80,200,120,0.35); }
+.cv-move-btn {
+  padding: 7px 11px; border-radius: 8px; cursor: pointer;
+  font-size: 0.82rem; font-family: inherit;
+  background: rgba(255,160,60,0.18); border: 1px solid rgba(255,160,60,0.3); color: #ffb860;
+}
+.cv-move-btn:hover { background: rgba(255,160,60,0.35); }
+/* 行事曆卡片內轉換面板 */
+.ev-cv-panel {
+  display: none; padding-top: 8px; margin-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.ev-cv-panel.open { display: block; }
+.btn-cv-toggle {
+  background: rgba(100,200,255,0.12); border: 1px solid rgba(100,200,255,0.25);
+  color: rgba(160,220,255,0.8); padding: 4px 8px;
   border-radius: 7px; cursor: pointer; font-size: 0.78rem; font-family: inherit;
 }
-.btn-to-memo:hover { background: rgba(167,139,250,0.4); }
-/* 轉行事曆：日期選擇列 */
-.te-tocal-row {
-  display: none; gap: 6px; align-items: center;
-  margin-bottom: 8px; flex-wrap: wrap;
-}
-.te-tocal-date {
-  flex: 1; min-width: 130px;
-  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.18);
-  color: #e8f4ff; padding: 8px 10px; border-radius: 8px;
-  font-size: 0.88rem; font-family: inherit;
-}
-.te-tocal-date::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
-.te-tocal-act { display: flex; gap: 5px; }
-.te-tocal-copy, .te-tocal-move {
-  padding: 7px 10px; border-radius: 8px; cursor: pointer;
-  font-size: 0.82rem; font-family: inherit; white-space: nowrap;
-}
-.te-tocal-copy { background: rgba(80,200,120,0.2); border: 1px solid rgba(80,200,120,0.4); color: #90e890; }
-.te-tocal-copy:hover { background: rgba(80,200,120,0.4); }
-.te-tocal-move { background: rgba(255,160,60,0.2); border: 1px solid rgba(255,160,60,0.35); color: #ffb860; }
-.te-tocal-move:hover { background: rgba(255,160,60,0.4); }
-/* 轉換確認列（行事曆→備忘 卡片內用） */
-.ev-convert-row {
-  display: none; align-items: center; gap: 6px; flex-wrap: wrap;
-  margin-top: 6px; padding-top: 6px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  font-size: 0.78rem; color: rgba(255,255,255,0.5);
-}
-.ev-convert-row.open { display: flex; }
-.ev-cv-copy, .ev-cv-move, .ev-cv-cancel {
-  padding: 4px 9px; border-radius: 7px; cursor: pointer;
-  font-size: 0.78rem; font-family: inherit;
-}
-.ev-cv-copy { background: rgba(167,139,250,0.2); border: 1px solid rgba(167,139,250,0.35); color: #c4b5fd; }
-.ev-cv-copy:hover { background: rgba(167,139,250,0.4); }
-.ev-cv-move { background: rgba(255,160,60,0.18); border: 1px solid rgba(255,160,60,0.3); color: #ffb860; }
-.ev-cv-move:hover { background: rgba(255,160,60,0.38); }
-.ev-cv-cancel { background: transparent; border: 1px solid rgba(255,255,255,0.12); color: #666; }
-.ev-cv-cancel:hover { color: #aaa; }
-/* 備忘錄→待辦：確認列 */
-.me-todo-row {
-  display: none; gap: 6px; align-items: center; flex-wrap: wrap;
-  margin-bottom: 8px;
-}
-.me-todo-copy, .me-todo-move {
-  flex: 1; padding: 8px; border-radius: 9px; cursor: pointer;
-  font-size: 0.82rem; font-family: inherit; text-align: center;
-}
-.me-todo-copy { background: rgba(80,200,120,0.18); border: 1px solid rgba(80,200,120,0.35); color: #90e890; }
-.me-todo-copy:hover { background: rgba(80,200,120,0.35); }
-.me-todo-move { background: rgba(255,160,60,0.18); border: 1px solid rgba(255,160,60,0.3); color: #ffb860; }
-.me-todo-move:hover { background: rgba(255,160,60,0.35); }
+.btn-cv-toggle:hover { background: rgba(100,200,255,0.28); }
+
 /* Toast */
 .toast-el {
   position: fixed; bottom: 58px; left: 50%;
@@ -1129,8 +1133,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
   .todo-edit-modal { padding: 18px 14px; }
   .todo-edit-modal textarea { font-size: 1rem; padding: 12px; }
   .te-img-wrap { width:80px; height:80px; }
-  .te-save, .te-del, .te-cancel, .te-tocal { font-size: 0.9rem; padding: 11px 8px; }
-  .te-tocal-copy, .te-tocal-move { font-size: 0.88rem; padding: 9px 10px; }
+  .te-save, .te-del, .te-cancel { font-size: 0.9rem; padding: 11px 8px; }
   .todo-edit-add-img { font-size: 0.9rem; padding: 10px 16px; }
 
   /* 備忘錄面板（手機版） */
@@ -1144,8 +1147,7 @@ body { display: flex; flex-direction: column; height: 100vh; }
   .memo-item-preview { font-size: 0.82rem; }
   .memo-edit-modal { padding: 18px 14px; }
   .memo-edit-modal input, .memo-edit-modal textarea { font-size: 1rem; padding: 12px; }
-  .me-save, .me-del, .me-cancel, .me-todo { font-size: 0.9rem; padding: 11px 8px; }
-  .me-todo-copy, .me-todo-move { font-size: 0.88rem; padding: 10px; }
+  .me-save, .me-del, .me-cancel { font-size: 0.9rem; padding: 11px 8px; }
   .todo-edit-btns { flex-wrap: wrap; }
   .memo-edit-btns { flex-wrap: wrap; }
   .right-panel-tabs { display: none !important; }
@@ -1288,15 +1290,28 @@ body { display: flex; flex-direction: column; height: 100vh; }
     <input id="memoEditTitle" type="text" placeholder="標題（選填）" maxlength="60">
     <textarea id="memoEditContent" placeholder="備忘錄內容…" maxlength="2000" rows="7"></textarea>
     <div class="memo-edit-date" id="memoEditDate"></div>
-    <!-- 轉待辦確認列 -->
-    <div class="me-todo-row" id="meTodoRow">
-      <span style="font-size:0.8rem;color:rgba(255,255,255,0.45);width:100%">轉為待辦事項：</span>
-      <button class="me-todo-copy" id="meTodoCopy">📋 複製（保留備忘錄）</button>
-      <button class="me-todo-move" id="meTodoMove">✂️ 移動（刪除備忘錄）</button>
+    <!-- 轉換區 -->
+    <div class="cv-section">
+      <div class="cv-header" id="memoCvHeader">🔄 轉換至其他功能</div>
+      <div class="cv-body" id="memoCvBody">
+        <div class="cv-dest-row">
+          <button class="cv-dest-btn" id="memoDestTodo">☑ 待辦事項</button>
+          <button class="cv-dest-btn" id="memoDestCal">📅 行事曆</button>
+        </div>
+        <div class="cv-sub-row" id="memoCvTodoRow">
+          <span class="cv-sub-label">轉為待辦事項：</span>
+          <button class="cv-copy-btn" id="memoCvTodoCopy">📋 複製</button>
+          <button class="cv-move-btn" id="memoCvTodoMove">✂️ 移動</button>
+        </div>
+        <div class="cv-sub-row" id="memoCvCalRow">
+          <input type="date" id="memoCvCalDate" class="cv-date-input">
+          <button class="cv-copy-btn" id="memoCvCalCopy">📋 複製</button>
+          <button class="cv-move-btn" id="memoCvCalMove">✂️ 移動</button>
+        </div>
+      </div>
     </div>
     <div class="memo-edit-btns">
       <button class="me-save" id="memoEditSave">💾 儲存</button>
-      <button class="me-todo" id="memoToTodo">☑ 轉待辦</button>
       <button class="me-del" id="memoEditDel">🗑 刪除</button>
       <button class="me-cancel" id="memoEditCancel">取消</button>
     </div>
@@ -1320,17 +1335,28 @@ body { display: flex; flex-direction: column; height: 100vh; }
     <div class="todo-edit-imgs" id="todoEditImgs"></div>
     <button class="todo-edit-add-img" id="todoEditAddImg">📷 新增圖片</button>
     <input type="file" id="todoEditImgInput" accept="image/*" multiple style="display:none">
-    <!-- 轉行事曆：日期選擇列 -->
-    <div class="te-tocal-row" id="teTocalRow">
-      <input type="date" id="teToCalDate" class="te-tocal-date">
-      <div class="te-tocal-act">
-        <button class="te-tocal-copy" id="teToCalCopy">📋 複製</button>
-        <button class="te-tocal-move" id="teToCalMove">✂️ 移動</button>
+    <!-- 轉換區 -->
+    <div class="cv-section">
+      <div class="cv-header" id="todoCvHeader">🔄 轉換至其他功能</div>
+      <div class="cv-body" id="todoCvBody">
+        <div class="cv-dest-row">
+          <button class="cv-dest-btn" id="todoDestCal">📅 行事曆</button>
+          <button class="cv-dest-btn" id="todoDestMemo">📝 備忘錄</button>
+        </div>
+        <div class="cv-sub-row" id="todoCvCalRow">
+          <input type="date" id="todoCvCalDate" class="cv-date-input">
+          <button class="cv-copy-btn" id="todoCvCalCopy">📋 複製</button>
+          <button class="cv-move-btn" id="todoCvCalMove">✂️ 移動</button>
+        </div>
+        <div class="cv-sub-row" id="todoCvMemoRow">
+          <span class="cv-sub-label">轉為備忘錄：</span>
+          <button class="cv-copy-btn" id="todoCvMemoCopy">📋 複製</button>
+          <button class="cv-move-btn" id="todoCvMemoMove">✂️ 移動</button>
+        </div>
       </div>
     </div>
     <div class="todo-edit-btns">
       <button class="te-save" id="todoEditSave">💾 儲存</button>
-      <button class="te-tocal" id="todoToCal">📅 轉行事曆</button>
       <button class="te-del" id="todoEditDel">🗑 刪除</button>
       <button class="te-cancel" id="todoEditCancel">取消</button>
     </div>
@@ -1553,25 +1579,49 @@ function renderEvList(){
       <div class="ev-card-imgs" id="ci-${mKey}-${i}"></div>
       <div class="ev-card-actions">
         <button class="btn-edit">編輯</button>
-        <button class="btn-to-memo">📝 轉備忘</button>
+        <button class="btn-cv-toggle">🔄 轉換</button>
         <button class="btn-del-ev">刪除</button>
       </div>
-      <div class="ev-convert-row" id="ecr-${mKey}-${i}">
-        <span>轉移至備忘錄：</span>
-        <button class="ev-cv-copy">📋 複製</button>
-        <button class="ev-cv-move">✂️ 移動（刪除行程）</button>
-        <button class="ev-cv-cancel">取消</button>
+      <div class="ev-cv-panel" id="ecp-${mKey}-${i}">
+        <div class="cv-dest-row">
+          <button class="ev-cv-dest" data-dest="todo">☑ 轉待辦</button>
+          <button class="ev-cv-dest" data-dest="memo">📝 轉備忘</button>
+        </div>
+        <div class="cv-sub-row" id="ecsr-${mKey}-${i}-todo">
+          <span class="cv-sub-label">轉為待辦事項：</span>
+          <button class="cv-copy-btn" data-dest="todo">📋 複製</button>
+          <button class="cv-move-btn" data-dest="todo">✂️ 移動</button>
+        </div>
+        <div class="cv-sub-row" id="ecsr-${mKey}-${i}-memo">
+          <span class="cv-sub-label">轉為備忘錄：</span>
+          <button class="cv-copy-btn" data-dest="memo">📋 複製</button>
+          <button class="cv-move-btn" data-dest="memo">✂️ 移動</button>
+        </div>
       </div>`;
     card.querySelector('.btn-edit').addEventListener('click',()=>startEdit(i));
     card.querySelector('.btn-del-ev').addEventListener('click',()=>delEv(i));
-    card.querySelector('.btn-to-memo').addEventListener('click',()=>{
-      document.querySelectorAll('.ev-convert-row').forEach(r=>r.classList.remove('open'));
-      document.getElementById(`ecr-${mKey}-${i}`)?.classList.add('open');
+    card.querySelector('.btn-cv-toggle').addEventListener('click', () => {
+      const panel = document.getElementById(`ecp-${mKey}-${i}`);
+      const open = panel.classList.toggle('open');
+      if (!open) {
+        panel.querySelectorAll('.cv-sub-row').forEach(r => r.classList.remove('open'));
+        panel.querySelectorAll('.ev-cv-dest').forEach(b => b.classList.remove('active'));
+      }
     });
-    card.querySelector('.ev-cv-copy').addEventListener('click',()=>{ evToMemo(i,false); });
-    card.querySelector('.ev-cv-move').addEventListener('click',()=>{ evToMemo(i,true); });
-    card.querySelector('.ev-cv-cancel').addEventListener('click',()=>{
-      document.getElementById(`ecr-${mKey}-${i}`)?.classList.remove('open');
+    card.querySelectorAll('.ev-cv-dest').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dest = btn.dataset.dest;
+        card.querySelectorAll('.ev-cv-dest').forEach(b => b.classList.toggle('active', b===btn));
+        card.querySelectorAll('.cv-sub-row').forEach(r => r.classList.remove('open'));
+        const subRow = document.getElementById(`ecsr-${mKey}-${i}-${dest}`);
+        if (subRow) subRow.classList.add('open');
+      });
+    });
+    card.querySelectorAll('.cv-copy-btn').forEach(btn => {
+      btn.addEventListener('click', () => evConvert(i, btn.dataset.dest, false));
+    });
+    card.querySelectorAll('.cv-move-btn').forEach(btn => {
+      btn.addEventListener('click', () => evConvert(i, btn.dataset.dest, true));
     });
     list.appendChild(card);
     // 載入圖片（base64 直接顯示）
@@ -1899,7 +1949,7 @@ function openTodoEdit(id) {
   todoEditId = id;
   document.getElementById('todoEditText').value = t.text;
   renderTodoEditImgs(t);
-  document.getElementById('teTocalRow').style.display = 'none';
+  resetCv('todoCvHeader', 'todoCvBody');
   document.getElementById('todoEditBg').classList.add('show');
   setTimeout(() => document.getElementById('todoEditText').focus(), 50);
 }
@@ -1947,30 +1997,22 @@ document.getElementById('todoEditSave').addEventListener('click', () => {
   if (!t || !newText) return;
   t.text = newText;
   saveTodos(); renderTodos();
-  document.getElementById('todoEditBg').classList.remove('show');
-  document.getElementById('teTocalRow').style.display = 'none';
-  todoEditId = null;
+  closeTodoEditModal();
 });
 
 document.getElementById('todoEditDel').addEventListener('click', () => {
   if (!confirm('確定刪除此待辦事項？')) return;
   todos = todos.filter(x => x.id !== todoEditId);
   saveTodos(); renderTodos();
-  document.getElementById('todoEditBg').classList.remove('show');
-  document.getElementById('teTocalRow').style.display = 'none';
-  todoEditId = null;
+  closeTodoEditModal();
 });
 
 document.getElementById('todoEditCancel').addEventListener('click', () => {
-  document.getElementById('todoEditBg').classList.remove('show');
-  document.getElementById('teTocalRow').style.display = 'none';
-  todoEditId = null;
+  closeTodoEditModal();
 });
 document.getElementById('todoEditBg').addEventListener('click', e => {
   if (e.target === document.getElementById('todoEditBg')) {
-    document.getElementById('todoEditBg').classList.remove('show');
-    document.getElementById('teTocalRow').style.display = 'none';
-    todoEditId = null;
+    closeTodoEditModal();
   }
 });
 
@@ -1985,89 +2027,167 @@ function showToast(msg) {
   _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
-// ══ 行事曆 → 備忘錄 ══
-function evToMemo(idx, deleteSource) {
-  const e = evs[mKey]?.[idx];
-  if (!e) return;
-  const parts = ['📅 ' + mKey];
-  if (e.loc)  parts.push('📍 ' + e.loc);
-  if (e.memo) parts.push(e.memo);
-  const now = new Date().toLocaleDateString('zh-TW');
-  memos.unshift({ id: Date.now(), title: e.title, content: parts.join('\n'), created: now, updated: now });
-  saveMemos(); renderMemos();
-  if (deleteSource) {
-    delEv(idx);
-    showToast('✅ 已移動至備忘錄（行程已刪除）');
-  } else {
-    document.querySelectorAll('.ev-convert-row').forEach(r => r.classList.remove('open'));
-    showToast('✅ 已複製至備忘錄');
-  }
+// ══ 互轉功能 ══
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-// ══ 待辦 → 行事曆 ══
-document.getElementById('todoToCal').addEventListener('click', () => {
-  const row = document.getElementById('teTocalRow');
-  const open = row.style.display !== 'none';
-  row.style.display = open ? 'none' : 'flex';
-  if (!open) {
-    const today = new Date();
-    const iso = today.getFullYear() + '-' +
-      String(today.getMonth()+1).padStart(2,'0') + '-' +
-      String(today.getDate()).padStart(2,'0');
-    document.getElementById('teToCalDate').value = iso;
-    document.getElementById('teToCalDate').focus();
-  }
+// 開關 cv-header / cv-body
+['todoCvHeader','memoCvHeader'].forEach(hid => {
+  document.getElementById(hid)?.addEventListener('click', () => {
+    const h = document.getElementById(hid);
+    const b = document.getElementById(hid.replace('Header','Body'));
+    h.classList.toggle('open');
+    if (b) b.classList.toggle('open');
+  });
 });
-function doTodoToCal(deleteSource) {
-  const dateVal = document.getElementById('teToCalDate').value;
-  if (!dateVal) { showToast('請先選擇日期'); return; }
+
+// 重置 cv 區塊（開 modal 時呼叫）
+function resetCv(headerId, bodyId) {
+  document.getElementById(headerId)?.classList.remove('open');
+  const body = document.getElementById(bodyId);
+  if (!body) return;
+  body.classList.remove('open');
+  body.querySelectorAll('.cv-sub-row').forEach(r => r.classList.remove('open'));
+  body.querySelectorAll('.cv-dest-btn').forEach(b => b.classList.remove('active'));
+}
+
+// 顯示子列（選擇目標後）
+function showSubRow(bodyId, activeBtn, subRowId) {
+  const body = document.getElementById(bodyId);
+  if (!body) return;
+  body.querySelectorAll('.cv-dest-btn').forEach(b => b.classList.remove('active'));
+  activeBtn.classList.add('active');
+  body.querySelectorAll('.cv-sub-row').forEach(r => r.classList.remove('open'));
+  document.getElementById(subRowId)?.classList.add('open');
+}
+
+// ── 待辦 → 行事曆 ──
+document.getElementById('todoDestCal')?.addEventListener('click', function() {
+  showSubRow('todoCvBody', this, 'todoCvCalRow');
+  document.getElementById('todoCvCalDate').value = todayISO();
+});
+// ── 待辦 → 備忘錄 ──
+document.getElementById('todoDestMemo')?.addEventListener('click', function() {
+  showSubRow('todoCvBody', this, 'todoCvMemoRow');
+});
+
+function doTodoConvert(dest, deleteSource) {
   const t = todos.find(x => x.id === todoEditId);
   if (!t) return;
-  if (!evs[dateVal]) evs[dateVal] = [];
-  evs[dateVal].push({ title: t.text, loc: '', memo: '', images: [] });
-  saveEv(); renderCal();
-  if (deleteSource) {
-    todos = todos.filter(x => x.id !== todoEditId);
-    saveTodos(); renderTodos();
-    document.getElementById('todoEditBg').classList.remove('show');
-    document.getElementById('teTocalRow').style.display = 'none';
-    todoEditId = null;
-    showToast('✅ 已移動至 ' + dateVal.replace(/-/g,'/') + ' 行事曆');
-  } else {
-    document.getElementById('teTocalRow').style.display = 'none';
-    showToast('✅ 已複製至 ' + dateVal.replace(/-/g,'/') + ' 行事曆');
+  const now = new Date().toLocaleDateString('zh-TW');
+  if (dest === 'cal') {
+    const dv = document.getElementById('todoCvCalDate').value;
+    if (!dv) { showToast('請先選擇日期'); return; }
+    if (!evs[dv]) evs[dv] = [];
+    evs[dv].push({ title: t.text, loc: '', memo: '', images: [] });
+    saveEv(); renderCal();
+    if (deleteSource) {
+      todos = todos.filter(x => x.id !== todoEditId);
+      saveTodos(); renderTodos();
+      closeTodoEditModal();
+      showToast('✅ 已移動至 ' + dv.replace(/-/g,'/') + ' 行事曆');
+    } else {
+      showToast('✅ 已複製至 ' + dv.replace(/-/g,'/') + ' 行事曆');
+    }
+  } else if (dest === 'memo') {
+    memos.unshift({ id: Date.now(), title: t.text, content: '', created: now, updated: now });
+    saveMemos(); renderMemos();
+    if (deleteSource) {
+      todos = todos.filter(x => x.id !== todoEditId);
+      saveTodos(); renderTodos();
+      closeTodoEditModal();
+      showToast('✅ 已移動至備忘錄');
+    } else {
+      showToast('✅ 已複製至備忘錄');
+    }
   }
 }
-document.getElementById('teToCalCopy').addEventListener('click', () => doTodoToCal(false));
-document.getElementById('teToCalMove').addEventListener('click', () => doTodoToCal(true));
+function closeTodoEditModal() {
+  document.getElementById('todoEditBg').classList.remove('show');
+  todoEditId = null;
+}
+document.getElementById('todoCvCalCopy')?.addEventListener('click', () => doTodoConvert('cal', false));
+document.getElementById('todoCvCalMove')?.addEventListener('click', () => doTodoConvert('cal', true));
+document.getElementById('todoCvMemoCopy')?.addEventListener('click', () => doTodoConvert('memo', false));
+document.getElementById('todoCvMemoMove')?.addEventListener('click', () => doTodoConvert('memo', true));
 
-// ══ 備忘錄 → 待辦 ══
-document.getElementById('memoToTodo').addEventListener('click', () => {
-  const row = document.getElementById('meTodoRow');
-  const open = row.style.display !== 'none';
-  row.style.display = open ? 'none' : 'flex';
+// ── 備忘錄 → 待辦 ──
+document.getElementById('memoDestTodo')?.addEventListener('click', function() {
+  showSubRow('memoCvBody', this, 'memoCvTodoRow');
 });
-function doMemoToTodo(deleteSource) {
+// ── 備忘錄 → 行事曆 ──
+document.getElementById('memoDestCal')?.addEventListener('click', function() {
+  showSubRow('memoCvBody', this, 'memoCvCalRow');
+  document.getElementById('memoCvCalDate').value = todayISO();
+});
+
+function doMemoConvert(dest, deleteSource) {
   const m = memos.find(x => x.id === memoEditId);
   if (!m) return;
-  const text = (m.title || m.content || '').slice(0, 100).trim();
-  if (!text) { showToast('內容為空，無法轉換'); return; }
-  todos.unshift({ id: Date.now(), text, pri: 'mid', done: false, created: new Date().toLocaleDateString('zh-TW'), images: [] });
-  saveTodos(); renderTodos();
-  if (deleteSource) {
-    memos = memos.filter(x => x.id !== memoEditId);
-    saveMemos(); renderMemos();
-    document.getElementById('memoEditBg').classList.remove('show');
-    document.getElementById('meTodoRow').style.display = 'none';
-    memoEditId = null;
-    showToast('✅ 已移動至待辦事項（備忘錄已刪除）');
-  } else {
-    document.getElementById('meTodoRow').style.display = 'none';
-    showToast('✅ 已複製至待辦事項');
+  const now = new Date().toLocaleDateString('zh-TW');
+  if (dest === 'todo') {
+    const text = (m.title || m.content || '').slice(0, 100).trim();
+    if (!text) { showToast('內容為空，無法轉換'); return; }
+    todos.unshift({ id: Date.now(), text, pri: 'mid', done: false, created: now, images: [] });
+    saveTodos(); renderTodos();
+    if (deleteSource) {
+      memos = memos.filter(x => x.id !== memoEditId);
+      saveMemos(); renderMemos();
+      closeMemoEditModal();
+      showToast('✅ 已移動至待辦事項');
+    } else {
+      showToast('✅ 已複製至待辦事項');
+    }
+  } else if (dest === 'cal') {
+    const dv = document.getElementById('memoCvCalDate').value;
+    if (!dv) { showToast('請先選擇日期'); return; }
+    const title = (m.title || m.content.slice(0,40) || '').trim();
+    if (!title) { showToast('內容為空，無法轉換'); return; }
+    if (!evs[dv]) evs[dv] = [];
+    evs[dv].push({ title, loc: '', memo: m.content || '', images: [] });
+    saveEv(); renderCal();
+    if (deleteSource) {
+      memos = memos.filter(x => x.id !== memoEditId);
+      saveMemos(); renderMemos();
+      closeMemoEditModal();
+      showToast('✅ 已移動至 ' + dv.replace(/-/g,'/') + ' 行事曆');
+    } else {
+      showToast('✅ 已複製至 ' + dv.replace(/-/g,'/') + ' 行事曆');
+    }
   }
 }
-document.getElementById('meTodoCopy').addEventListener('click', () => doMemoToTodo(false));
-document.getElementById('meTodoMove').addEventListener('click', () => doMemoToTodo(true));
+function closeMemoEditModal() {
+  document.getElementById('memoEditBg').classList.remove('show');
+  memoEditId = null;
+}
+document.getElementById('memoCvTodoCopy')?.addEventListener('click', () => doMemoConvert('todo', false));
+document.getElementById('memoCvTodoMove')?.addEventListener('click', () => doMemoConvert('todo', true));
+document.getElementById('memoCvCalCopy')?.addEventListener('click', () => doMemoConvert('cal', false));
+document.getElementById('memoCvCalMove')?.addEventListener('click', () => doMemoConvert('cal', true));
+
+// ── 行事曆 → 待辦 / 備忘錄 ──
+function evConvert(idx, dest, deleteSource) {
+  const e = evs[mKey]?.[idx];
+  if (!e) return;
+  const now = new Date().toLocaleDateString('zh-TW');
+  if (dest === 'todo') {
+    todos.unshift({ id: Date.now(), text: e.title, pri: 'mid', done: false, created: now, images: [] });
+    saveTodos(); renderTodos();
+    if (deleteSource) { delEv(idx); showToast('✅ 已移動至待辦事項'); }
+    else showToast('✅ 已複製至待辦事項');
+  } else if (dest === 'memo') {
+    const parts = ['📅 ' + mKey];
+    if (e.loc) parts.push('📍 ' + e.loc);
+    if (e.memo) parts.push(e.memo);
+    memos.unshift({ id: Date.now(), title: e.title, content: parts.join('\n'), created: now, updated: now });
+    saveMemos(); renderMemos();
+    if (deleteSource) { delEv(idx); showToast('✅ 已移動至備忘錄'); }
+    else showToast('✅ 已複製至備忘錄');
+  }
+}
+
 window.addEventListener('storage',e=>{
   if(e.key===TODO_KEY){try{todos=JSON.parse(e.newValue)||[];}catch(x){}renderTodos();}
   if(e.key===EV_KEY){try{evs=JSON.parse(e.newValue)||{};}catch(x){}renderCal();}
@@ -2149,6 +2269,7 @@ function openMemoEdit(id) {
   document.getElementById('memoEditContent').value = m.content || '';
   const dateEl = document.getElementById('memoEditDate');
   if (dateEl) dateEl.textContent = `建立：${m.created || ''}　更新：${m.updated || ''}`;
+  resetCv('memoCvHeader', 'memoCvBody');
   document.getElementById('memoEditBg').classList.add('show');
   setTimeout(() => document.getElementById('memoEditContent').focus(), 50);
 }
@@ -2167,28 +2288,20 @@ document.getElementById('memoEditSave').addEventListener('click', () => {
   m.content = document.getElementById('memoEditContent').value.trim();
   m.updated = new Date().toLocaleDateString('zh-TW');
   saveMemos(); renderMemos();
-  document.getElementById('memoEditBg').classList.remove('show');
-  document.getElementById('meTodoRow').style.display = 'none';
-  memoEditId = null;
+  closeMemoEditModal();
 });
 document.getElementById('memoEditDel').addEventListener('click', () => {
   if (!confirm('確定刪除此備忘錄？')) return;
   memos = memos.filter(x => x.id !== memoEditId);
   saveMemos(); renderMemos();
-  document.getElementById('memoEditBg').classList.remove('show');
-  document.getElementById('meTodoRow').style.display = 'none';
-  memoEditId = null;
+  closeMemoEditModal();
 });
 document.getElementById('memoEditCancel').addEventListener('click', () => {
-  document.getElementById('memoEditBg').classList.remove('show');
-  document.getElementById('meTodoRow').style.display = 'none';
-  memoEditId = null;
+  closeMemoEditModal();
 });
 document.getElementById('memoEditBg').addEventListener('click', e => {
   if (e.target === document.getElementById('memoEditBg')) {
-    document.getElementById('memoEditBg').classList.remove('show');
-    document.getElementById('meTodoRow').style.display = 'none';
-    memoEditId = null;
+    closeMemoEditModal();
   }
 });
 
