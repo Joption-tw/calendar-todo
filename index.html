@@ -233,22 +233,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
   border-color: rgba(100,200,255,0.4);
   color: var(--accent);
 }
-.pri-row { display: flex; gap: 5px; flex-shrink: 0; }
-.pri-btn {
-  flex: 1;
-  padding: 4px 0;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  border: 1px solid rgba(255,255,255,0.1);
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-  background: rgba(255,255,255,0.05);
-  color: rgba(255,255,255,0.4);
-}
-.pri-btn.sel-high { background: rgba(255,100,100,0.22); border-color: #ff6464; color: #ffaaaa; }
-.pri-btn.sel-mid  { background: rgba(255,180,0,0.18);   border-color: #ffb400; color: #ffd060; }
-.pri-btn.sel-low  { background: rgba(80,200,120,0.18);  border-color: #50c878; color: #80e8a0; }
 .add-row { display: flex; gap: 6px; flex-shrink: 0; }
 .add-row input {
   flex: 1;
@@ -288,18 +272,15 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .todo-list::-webkit-scrollbar-thumb { background: rgba(100,200,255,0.25); border-radius: 2px; }
 .t-item {
   display: flex;
-  align-items: flex-start;
-  gap: 7px;
-  padding: 8px 9px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
   background: rgba(255,255,255,0.04);
   border-radius: 8px;
-  border-left: 3px solid rgba(255,255,255,0.15);
+  border-left: 3px solid rgba(100,200,255,0.2);
   transition: all 0.15s;
 }
 .t-item:hover { background: rgba(255,255,255,0.07); }
-.t-item.pri-high { border-left-color: #ff6464; }
-.t-item.pri-mid  { border-left-color: #ffb400; }
-.t-item.pri-low  { border-left-color: #50c878; }
 .t-item.done { opacity: 0.42; }
 .chk {
   width: 16px; height: 16px;
@@ -331,7 +312,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
   user-select: text;
 }
 .t-item.done .t-text { text-decoration: line-through; color: rgba(255,255,255,0.35); }
-.t-meta { font-size: 0.63rem; color: rgba(255,255,255,0.3); margin-top: 2px; }
 .del-btn {
   background: none;
   border: none;
@@ -396,19 +376,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
   flex-shrink: 0;
 }
 .t-img:hover { transform: scale(1.06); }
-.t-img-add {
-  width: 58px; height: 58px;
-  border-radius: 7px;
-  border: 1.5px dashed rgba(100,200,255,0.35);
-  background: rgba(100,200,255,0.05);
-  color: rgba(100,200,255,0.5);
-  font-size: 1.4rem;
-  cursor: pointer;
-  display: flex; align-items:center; justify-content:center;
-  flex-shrink: 0;
-  transition: all 0.15s;
-}
-.t-img-add:hover { background:rgba(100,200,255,0.12); color:var(--accent); }
 
 /* 📷 上傳按鈕（新增列旁） */
 .cam-btn {
@@ -443,85 +410,103 @@ body { display: flex; flex-direction: column; height: 100vh; }
   color: rgba(255,255,255,0.24);
   padding: 2px 0;
 }
-/* 同步按鈕 */
-.sync-row { display: flex; gap: 5px; flex-shrink: 0; }
-.sync-btn {
-  flex: 1;
-  background: rgba(167,139,250,0.12);
-  border: 1px solid rgba(167,139,250,0.28);
-  color: rgba(167,139,250,0.85);
-  font-size: 0.7rem;
-  padding: 5px 0;
-  border-radius: 7px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.15s;
-}
-.sync-btn:hover { background: rgba(167,139,250,0.28); color: #c4b5fd; }
-/* 同步 Modal */
-.sync-modal-bg {
+/* ══ 待辦編輯 Modal ══ */
+.todo-edit-bg {
   display: none;
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.72);
   z-index: 300;
   align-items: center;
   justify-content: center;
 }
-.sync-modal-bg.show { display: flex; }
-.sync-modal {
-  background: rgba(15,25,55,0.92);
+.todo-edit-bg.show { display: flex; }
+.todo-edit-modal {
+  background: rgba(12,22,52,0.97);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(167,139,250,0.3);
-  border-radius: 14px;
-  padding: 22px;
-  width: 340px;
-  max-width: 95vw;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+  border: 1px solid rgba(100,200,255,0.2);
+  border-radius: 16px;
+  padding: 20px 18px;
+  width: 360px;
+  max-width: 96vw;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.65);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.sync-modal h3 { font-size: 1rem; color: #c4b5fd; margin-bottom: 14px; }
-.sync-modal textarea {
+.todo-edit-modal h3 { font-size: 0.95rem; color: var(--accent); }
+.todo-edit-modal textarea {
   width: 100%;
-  height: 110px;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(167,139,250,0.25);
-  color: #e0e0ff;
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 0.75rem;
-  font-family: monospace;
-  resize: none;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(100,200,255,0.25);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 72px;
   outline: none;
-  margin-bottom: 10px;
-  user-select: text;
 }
-.sync-modal-btns { display: flex; gap: 7px; margin-bottom: 10px; }
-.sync-act-btn {
-  flex: 1;
-  padding: 8px;
-  border-radius: 8px;
+.todo-edit-modal textarea:focus { border-color: rgba(100,200,255,0.55); }
+.todo-edit-imgs { display: flex; flex-wrap: wrap; gap: 7px; }
+.te-img-wrap {
+  position: relative; width: 72px; height: 72px;
+  border-radius: 9px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12); flex-shrink: 0;
+}
+.te-img-wrap img { width:100%; height:100%; object-fit:cover; cursor:pointer; display:block; }
+.te-img-del {
+  position: absolute; top:2px; right:2px;
+  background: rgba(0,0,0,0.65); color:#ff9090;
+  border: none; border-radius: 50%;
+  width:18px; height:18px; font-size:0.65rem;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.te-img-del:hover { background:rgba(200,0,0,0.7); color:#fff; }
+.todo-edit-add-img {
+  background: rgba(100,200,255,0.08);
+  border: 1.5px dashed rgba(100,200,255,0.35);
+  color: rgba(100,200,255,0.7);
   font-size: 0.82rem;
-  cursor: pointer;
-  font-family: inherit;
-  border: none;
-  transition: all 0.15s;
+  padding: 8px 14px;
+  border-radius: 9px; cursor: pointer;
+  font-family: inherit; transition: all 0.15s;
+  align-self: flex-start;
 }
-.sync-act-btn.copy { background: rgba(100,200,255,0.2); color: #64c8ff; border: 1px solid rgba(100,200,255,0.35); }
-.sync-act-btn.copy:hover { background: rgba(100,200,255,0.38); }
-.sync-act-btn.import { background: rgba(80,200,120,0.2); color: #50e890; border: 1px solid rgba(80,200,120,0.35); }
-.sync-act-btn.import:hover { background: rgba(80,200,120,0.35); }
-.sync-modal-close {
-  width: 100%;
-  background: rgba(255,255,255,0.06);
-  border: none;
-  color: #888;
-  padding: 7px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.85rem;
+.todo-edit-add-img:hover { background: rgba(100,200,255,0.18); color: var(--accent); }
+.todo-edit-btns { display: flex; gap: 7px; }
+.te-save {
+  flex: 1;
+  background: rgba(100,200,255,0.22);
+  border: 1px solid rgba(100,200,255,0.38);
+  color: var(--accent); padding: 9px;
+  border-radius: 9px; cursor: pointer;
+  font-size: 0.88rem; font-family: inherit;
 }
-.sync-modal-close:hover { color: #fff; background: rgba(255,255,255,0.13); }
-.sync-hint { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-bottom: 10px; line-height: 1.5; }
+.te-save:hover { background: rgba(100,200,255,0.4); }
+.te-del {
+  background: rgba(255,70,70,0.1);
+  border: 1px solid rgba(255,70,70,0.28);
+  color: rgba(255,120,120,0.85);
+  padding: 9px 12px; border-radius: 9px;
+  cursor: pointer; font-size: 0.88rem; font-family: inherit;
+}
+.te-del:hover { background: rgba(255,70,70,0.25); color: #ff9090; }
+.te-cancel {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #888; padding: 9px 12px;
+  border-radius: 9px; cursor: pointer;
+  font-size: 0.88rem; font-family: inherit;
+}
+.te-cancel:hover { color: #fff; background: rgba(255,255,255,0.12); }
+/* 圖片數量小徽章 */
+.t-img-badge {
+  font-size: 0.62rem; color: rgba(100,200,255,0.55);
+  margin-top: 2px; display: inline-block;
+}
 
 /* ══ Modal ══ */
 .modal-bg {
@@ -919,63 +904,60 @@ body { display: flex; flex-direction: column; height: 100vh; }
   }
   .todo-panel.mob-show { display: flex; }
 
+  /* 手機 header 壓縮 */
+  .mob-header { padding: 8px 14px; }
+  .mob-clock { font-size: 1.7rem; }
+
+  /* 待辦面板：更緊湊 */
+  .todo-panel { padding: 8px 10px 6px; gap: 7px; }
+
   /* 篩選 Tab */
   .tabs { gap: 8px; }
   .tab {
-    font-size: 0.88rem;
-    padding: 9px 0;
-    border-radius: 11px;
-    font-weight: 500;
-  }
-
-  /* 優先度按鈕 */
-  .pri-row { gap: 8px; }
-  .pri-btn {
     font-size: 0.82rem;
-    padding: 8px 0;
-    border-radius: 10px;
+    padding: 7px 0;
+    border-radius: 9px;
   }
 
   /* 輸入列 */
   .add-row { gap: 8px; }
   .add-row input {
-    font-size: 1.02rem;
-    padding: 12px 14px;
+    font-size: 0.95rem;
+    padding: 10px 12px;
     border-radius: 12px;
-    height: 48px;
+    height: 42px;
   }
   .add-btn {
-    width: 48px; height: 48px;
-    font-size: 1.6rem;
-    border-radius: 12px;
+    width: 42px; height: 42px;
+    font-size: 1.4rem;
+    border-radius: 10px;
     flex-shrink: 0;
   }
 
   /* 待辦列表 */
-  .todo-list { gap: 7px; padding-right: 0; }
-  .t-item {
-    padding: 13px 12px;
-    border-radius: 12px;
-    border-left-width: 4px;
-    gap: 10px;
-  }
-  .chk { width: 22px; height: 22px; border-radius: 6px; margin-top: 2px; }
-  .t-text { font-size: 1rem; line-height: 1.45; }
-  .t-meta { font-size: 0.72rem; margin-top: 3px; }
+  .todo-list { gap: 5px; padding-right: 0; }
+  .t-item { padding: 10px 11px; border-left-width: 3px; gap: 10px; align-items: center; }
+  .chk { width: 20px; height: 20px; border-radius: 6px; }
+  .t-text { font-size: 0.95rem; line-height: 1.4; }
   .del-btn { font-size: 1.1rem; padding: 0 4px; color: rgba(255,100,100,0.4); }
 
   /* 底部按鈕 */
-  .todo-bottom { gap: 7px; }
-  .clear-btn { font-size: 0.9rem; padding: 11px; border-radius: 11px; }
-  .sync-row { gap: 8px; }
-  .sync-btn { font-size: 0.84rem; padding: 10px 0; border-radius: 10px; }
+  .todo-bottom { gap: 5px; }
+  .clear-btn { font-size: 0.85rem; padding: 8px; border-radius: 9px; }
+  .dt-bar { font-size: 0.65rem; }
 
   /* 待辦圖片 */
-  .cam-btn { width:48px; height:48px; font-size:1.35rem; border-radius:12px; }
+  .cam-btn { width:42px; height:42px; font-size:1.2rem; border-radius:10px; }
   .t-img { width:68px; height:68px; border-radius:9px; }
-  .t-img-add { width:68px; height:68px; border-radius:9px; font-size:1.6rem; }
   .t-img-thumb { width:64px; height:64px; border-radius:9px; }
   .t-imgs { gap: 7px; margin-top: 9px; }
+
+  /* 待辦編輯 Modal */
+  .todo-edit-modal { padding: 18px 14px; }
+  .todo-edit-modal textarea { font-size: 1rem; padding: 12px; }
+  .te-img-wrap { width:80px; height:80px; }
+  .te-save, .te-del, .te-cancel { font-size: 1rem; padding: 12px 10px; }
+  .todo-edit-add-img { font-size: 0.9rem; padding: 10px 16px; }
 
   /* Modal 優化 */
   .modal {
@@ -1066,11 +1048,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
       <button class="tab" data-f="pending">待辦</button>
       <button class="tab" data-f="done">完成</button>
     </div>
-    <div class="pri-row">
-      <button class="pri-btn" data-p="high">🔴 高</button>
-      <button class="pri-btn sel-mid" data-p="mid">🟡 中</button>
-      <button class="pri-btn" data-p="low">🟢 低</button>
-    </div>
     <div class="add-row">
       <input id="todoInp" type="text" placeholder="新增待辦事項…" maxlength="80">
       <button class="cam-btn" id="todoCamBtn" title="附加圖片">📷</button>
@@ -1078,14 +1055,9 @@ body { display: flex; flex-direction: column; height: 100vh; }
     </div>
     <div class="todo-img-strip" id="todoImgStrip"></div>
     <input type="file" id="todoImgInput" accept="image/*" multiple style="display:none">
-    <input type="file" id="todoItemImgInput" accept="image/*" multiple style="display:none">
     <div class="todo-list" id="todoList"></div>
     <div class="todo-bottom">
       <button class="clear-btn" id="clearBtn">🗑 清除已完成</button>
-      <div class="sync-row">
-        <button class="sync-btn" id="exportBtn">📤 匯出資料</button>
-        <button class="sync-btn" id="importBtn">📥 匯入資料</button>
-      </div>
       <div class="dt-bar" id="dtBar"></div>
     </div>
   </div>
@@ -1110,17 +1082,19 @@ body { display: flex; flex-direction: column; height: 100vh; }
   </div>
 </div>
 
-<!-- 同步 Modal -->
-<div class="sync-modal-bg" id="syncModalBg">
-  <div class="sync-modal">
-    <h3 id="syncModalTitle">📤 匯出資料</h3>
-    <p class="sync-hint" id="syncHint">複製下方文字，到另一台裝置選「匯入資料」貼上即可同步。</p>
-    <textarea id="syncTextarea" placeholder="資料將顯示於此…"></textarea>
-    <div class="sync-modal-btns">
-      <button class="sync-act-btn copy" id="syncCopyBtn">📋 複製</button>
-      <button class="sync-act-btn import" id="syncDoImportBtn" style="display:none">✅ 確認匯入</button>
+<!-- 待辦編輯 Modal -->
+<div class="todo-edit-bg" id="todoEditBg">
+  <div class="todo-edit-modal">
+    <h3>✏️ 編輯待辦</h3>
+    <textarea id="todoEditText" maxlength="200" rows="3" placeholder="待辦事項內容…"></textarea>
+    <div class="todo-edit-imgs" id="todoEditImgs"></div>
+    <button class="todo-edit-add-img" id="todoEditAddImg">📷 新增圖片</button>
+    <input type="file" id="todoEditImgInput" accept="image/*" multiple style="display:none">
+    <div class="todo-edit-btns">
+      <button class="te-save" id="todoEditSave">💾 儲存</button>
+      <button class="te-del" id="todoEditDel">🗑 刪除</button>
+      <button class="te-cancel" id="todoEditCancel">取消</button>
     </div>
-    <button class="sync-modal-close" id="syncModalClose">關閉</button>
   </div>
 </div>
 
@@ -1509,8 +1483,7 @@ document.addEventListener('keydown',e=>{
 });
 
 // ══ 待辦清單 ══
-let tFilter='all', tPri='mid';
-const priLabel={high:'🔴高',mid:'🟡中',low:'🟢低'};
+let tFilter='all';
 
 document.querySelectorAll('.tab').forEach(t=>{
   t.addEventListener('click',()=>{
@@ -1520,16 +1493,8 @@ document.querySelectorAll('.tab').forEach(t=>{
     renderTodos();
   });
 });
-document.querySelectorAll('.pri-btn').forEach(b=>{
-  b.addEventListener('click',()=>{
-    tPri=b.dataset.p;
-    document.querySelectorAll('.pri-btn').forEach(x=>x.className='pri-btn');
-    b.classList.add('sel-'+tPri);
-  });
-});
 // ── 待辦圖片暫存 ──
 let pendingTodoImgs = [];
-let todoItemImgTargetId = null; // 正在加圖的 todo id
 
 function refreshTodoImgStrip(){
   const strip = document.getElementById('todoImgStrip');
@@ -1555,22 +1520,12 @@ document.getElementById('todoImgInput').addEventListener('change', async e=>{
   e.target.value=''; refreshTodoImgStrip();
 });
 
-// 替既有 todo 加圖
-document.getElementById('todoItemImgInput').addEventListener('change', async e=>{
-  const t=todos.find(x=>x.id===todoItemImgTargetId); if(!t) return;
-  if(!t.images) t.images=[];
-  for(const f of e.target.files){
-    const d=await compressImg(f); if(d) t.images.push(d);
-  }
-  e.target.value=''; saveTodos(); renderTodos();
-});
-
 function addTodo(){
   const inp=document.getElementById('todoInp');
   const text=inp.value.trim();
   if(!text)return;
   const images=[...pendingTodoImgs];
-  todos.unshift({id:Date.now(),text,pri:tPri,done:false,created:new Date().toLocaleDateString('zh-TW'),images});
+  todos.unshift({id:Date.now(),text,pri:'mid',done:false,created:new Date().toLocaleDateString('zh-TW'),images});
   pendingTodoImgs=[]; refreshTodoImgStrip();
   saveTodos(); inp.value=''; renderTodos();
 }
@@ -1578,64 +1533,130 @@ document.getElementById('todoAddBtn').addEventListener('click',addTodo);
 document.getElementById('todoInp').addEventListener('keydown',e=>{if(e.key==='Enter')addTodo();});
 document.getElementById('clearBtn').addEventListener('click',()=>{todos=todos.filter(x=>!x.done);saveTodos();renderTodos();});
 
-function renderTodos(){
-  const list=document.getElementById('todoList');
-  list.innerHTML='';
-  const done=todos.filter(x=>x.done).length;
-  const badgeText=`${done}/${todos.length}`;
-  document.getElementById('badge').textContent=badgeText;
-  const mb=document.getElementById('mobBadge');if(mb)mb.textContent=`待辦 ${badgeText}`;
-  let show=todos;
-  if(tFilter==='pending')show=todos.filter(x=>!x.done);
-  if(tFilter==='done')show=todos.filter(x=>x.done);
-  if(!show.length){list.innerHTML=`<div class="t-empty">${tFilter==='done'?'尚無完成項目':'沒有待辦事項 🎉'}</div>`;return;}
-  show.forEach(t=>{
-    const div=document.createElement('div');
-    div.className=`t-item pri-${t.pri}${t.done?' done':''}`;
+function renderTodos() {
+  const list = document.getElementById('todoList');
+  list.innerHTML = '';
+  const done = todos.filter(x => x.done).length;
+  const badgeText = `${done}/${todos.length}`;
+  const badgeEl = document.getElementById('badge');
+  if (badgeEl) badgeEl.textContent = badgeText;
+  const mb = document.getElementById('mobBadge');
+  if (mb) mb.textContent = `待辦 ${badgeText}`;
 
-    // 圖片區
-    const imgs=t.images||[];
-    let imgsHtml='';
-    if(imgs.length||true){ // 永遠顯示加圖按鈕
-      imgsHtml=`<div class="t-imgs">
-        ${imgs.map(d=>`<img class="t-img" src="${d}" data-url="${d}">`).join('')}
-        <button class="t-img-add" data-tid="${t.id}" title="加入圖片">＋</button>
-      </div>`;
-    }
+  let show = todos;
+  if (tFilter === 'pending') show = todos.filter(x => !x.done);
+  if (tFilter === 'done') show = todos.filter(x => x.done);
 
-    div.innerHTML=`
-      <input type="checkbox" class="chk" ${t.done?'checked':''}>
+  if (!show.length) {
+    list.innerHTML = `<div class="t-empty">${tFilter === 'done' ? '尚無完成項目' : '沒有待辦事項 🎉'}</div>`;
+    return;
+  }
+
+  show.forEach(t => {
+    const div = document.createElement('div');
+    div.className = `t-item${t.done ? ' done' : ''}`;
+    const imgCount = (t.images || []).length;
+    div.innerHTML = `
+      <input type="checkbox" class="chk" ${t.done ? 'checked' : ''}>
       <div class="t-body">
         <div class="t-text">${esc(t.text)}</div>
-        <div class="t-meta">${priLabel[t.pri]} · ${t.created||''}</div>
-        ${imgsHtml}
+        ${imgCount ? `<span class="t-img-badge">🖼 ${imgCount} 張圖</span>` : ''}
       </div>
-      <button class="del-btn">✕</button>`;
+      <button class="del-btn" title="刪除">✕</button>`;
 
-    // 點圖片開燈箱
-    div.querySelectorAll('.t-img').forEach(img=>{
-      img.addEventListener('click',()=>openLightbox(img.dataset.url));
+    div.querySelector('.t-body').style.cursor = 'pointer';
+    div.querySelector('.t-body').addEventListener('click', () => openTodoEdit(t.id));
+    div.querySelector('.chk').addEventListener('change', () => {
+      const it = todos.find(x => x.id === t.id);
+      if (it) { it.done = !it.done; saveTodos(); renderTodos(); }
     });
-    // 加圖按鈕
-    div.querySelector('.t-img-add').addEventListener('click',()=>{
-      todoItemImgTargetId=t.id;
-      document.getElementById('todoItemImgInput').click();
+    div.querySelector('.del-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      todos = todos.filter(x => x.id !== t.id);
+      saveTodos(); renderTodos();
     });
-    // 長按圖片刪除
-    div.querySelectorAll('.t-img').forEach(img=>{
-      img.addEventListener('contextmenu', e=>{
-        e.preventDefault();
-        if(!confirm('刪除這張圖片？'))return;
-        const it=todos.find(x=>x.id===t.id);
-        if(it){ it.images=it.images.filter(d=>d!==img.dataset.url); saveTodos(); renderTodos(); }
-      });
-    });
-
-    div.querySelector('.chk').addEventListener('change',()=>{const it=todos.find(x=>x.id===t.id);if(it){it.done=!it.done;saveTodos();renderTodos();}});
-    div.querySelector('.del-btn').addEventListener('click',()=>{todos=todos.filter(x=>x.id!==t.id);saveTodos();renderTodos();});
     list.appendChild(div);
   });
 }
+
+// ══ 待辦編輯 Modal ══
+let todoEditId = null;
+
+function openTodoEdit(id) {
+  const t = todos.find(x => x.id === id);
+  if (!t) return;
+  todoEditId = id;
+  document.getElementById('todoEditText').value = t.text;
+  renderTodoEditImgs(t);
+  document.getElementById('todoEditBg').classList.add('show');
+  setTimeout(() => document.getElementById('todoEditText').focus(), 50);
+}
+
+function renderTodoEditImgs(t) {
+  const imgs = (t.images || []);
+  const container = document.getElementById('todoEditImgs');
+  container.innerHTML = '';
+  imgs.forEach(dataUrl => {
+    const wrap = document.createElement('div');
+    wrap.className = 'te-img-wrap';
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.addEventListener('click', () => openLightbox(dataUrl));
+    const del = document.createElement('button');
+    del.className = 'te-img-del'; del.textContent = '✕';
+    del.addEventListener('click', e => {
+      e.stopPropagation();
+      const it = todos.find(x => x.id === todoEditId);
+      if (it) { it.images = it.images.filter(d => d !== dataUrl); saveTodos(); renderTodoEditImgs(it); renderTodos(); }
+    });
+    wrap.appendChild(img); wrap.appendChild(del);
+    container.appendChild(wrap);
+  });
+}
+
+document.getElementById('todoEditAddImg').addEventListener('click', () => {
+  document.getElementById('todoEditImgInput').click();
+});
+document.getElementById('todoEditImgInput').addEventListener('change', async e => {
+  const t = todos.find(x => x.id === todoEditId);
+  if (!t) return;
+  if (!t.images) t.images = [];
+  for (const f of e.target.files) {
+    const d = await compressImg(f);
+    if (d) t.images.push(d);
+  }
+  e.target.value = '';
+  saveTodos(); renderTodoEditImgs(t); renderTodos();
+});
+
+document.getElementById('todoEditSave').addEventListener('click', () => {
+  const t = todos.find(x => x.id === todoEditId);
+  const newText = document.getElementById('todoEditText').value.trim();
+  if (!t || !newText) return;
+  t.text = newText;
+  saveTodos(); renderTodos();
+  document.getElementById('todoEditBg').classList.remove('show');
+  todoEditId = null;
+});
+
+document.getElementById('todoEditDel').addEventListener('click', () => {
+  if (!confirm('確定刪除此待辦事項？')) return;
+  todos = todos.filter(x => x.id !== todoEditId);
+  saveTodos(); renderTodos();
+  document.getElementById('todoEditBg').classList.remove('show');
+  todoEditId = null;
+});
+
+document.getElementById('todoEditCancel').addEventListener('click', () => {
+  document.getElementById('todoEditBg').classList.remove('show');
+  todoEditId = null;
+});
+document.getElementById('todoEditBg').addEventListener('click', e => {
+  if (e.target === document.getElementById('todoEditBg')) {
+    document.getElementById('todoEditBg').classList.remove('show');
+    todoEditId = null;
+  }
+});
 window.addEventListener('storage',e=>{
   if(e.key===TODO_KEY){try{todos=JSON.parse(e.newValue)||[];}catch(x){}renderTodos();}
   if(e.key===EV_KEY){try{evs=JSON.parse(e.newValue)||{};}catch(x){}renderCal();}
@@ -1652,72 +1673,6 @@ document.addEventListener('fullscreenchange',()=>{
   const btn=document.getElementById('fsBtn');
   btn.textContent=document.fullscreenElement?'⊡':'⛶';
   btn.title=document.fullscreenElement?'離開全螢幕 (F11)':'全螢幕 (F11)';
-});
-
-// ══ 匯出 / 匯入 ══
-let syncMode = 'export';
-
-function openSyncModal(mode) {
-  syncMode = mode;
-  const bg = document.getElementById('syncModalBg');
-  const title = document.getElementById('syncModalTitle');
-  const hint = document.getElementById('syncHint');
-  const ta = document.getElementById('syncTextarea');
-  const copyBtn = document.getElementById('syncCopyBtn');
-  const importBtn = document.getElementById('syncDoImportBtn');
-
-  if (mode === 'export') {
-    title.textContent = '📤 匯出資料';
-    hint.textContent = '複製下方文字，到另一台裝置選「匯入資料」貼上即可同步。';
-    const data = { todos, evs, exported: new Date().toLocaleString('zh-TW') };
-    ta.value = JSON.stringify(data);
-    ta.readOnly = true;
-    copyBtn.style.display = '';
-    importBtn.style.display = 'none';
-  } else {
-    title.textContent = '📥 匯入資料';
-    hint.textContent = '請貼上從另一台裝置匯出的文字，再按「確認匯入」。';
-    ta.value = '';
-    ta.readOnly = false;
-    copyBtn.style.display = 'none';
-    importBtn.style.display = '';
-  }
-  bg.classList.add('show');
-  if (mode === 'export') { ta.select(); } else { ta.focus(); }
-}
-
-document.getElementById('exportBtn').addEventListener('click', () => openSyncModal('export'));
-document.getElementById('importBtn').addEventListener('click', () => openSyncModal('import'));
-
-document.getElementById('syncCopyBtn').addEventListener('click', () => {
-  const ta = document.getElementById('syncTextarea');
-  ta.select();
-  navigator.clipboard.writeText(ta.value).then(() => {
-    const btn = document.getElementById('syncCopyBtn');
-    btn.textContent = '✅ 已複製！';
-    setTimeout(() => btn.textContent = '📋 複製', 1800);
-  }).catch(() => { document.execCommand('copy'); });
-});
-
-document.getElementById('syncDoImportBtn').addEventListener('click', () => {
-  try {
-    const data = JSON.parse(document.getElementById('syncTextarea').value.trim());
-    if (data.todos) { todos = data.todos; saveTodos(); }
-    if (data.evs)   { evs   = data.evs;   saveEv();    }
-    renderTodos(); renderCal();
-    document.getElementById('syncModalBg').classList.remove('show');
-    alert('匯入成功！');
-  } catch(e) {
-    alert('格式錯誤，請確認貼上的內容正確。');
-  }
-});
-
-document.getElementById('syncModalClose').addEventListener('click', () => {
-  document.getElementById('syncModalBg').classList.remove('show');
-});
-document.getElementById('syncModalBg').addEventListener('click', e => {
-  if (e.target === document.getElementById('syncModalBg'))
-    document.getElementById('syncModalBg').classList.remove('show');
 });
 
 // ══ 手機版 Tab 切換 ══
