@@ -290,17 +290,46 @@ body { display: flex; flex-direction: column; height: 100vh; }
   background: rgba(255,255,255,0.04);
   border-radius: 8px;
   border-left: 3px solid rgba(100,200,255,0.2);
-  transition: all 0.15s;
+  transition: background 0.1s;
+  cursor: grab;
+  position: relative;
 }
-.t-item:hover { background: rgba(255,255,255,0.07); }
+.t-item:hover { background: rgba(255,255,255,0.08); cursor: grab; }
 .t-item.done { opacity: 0.42; }
-.t-item.dragging { opacity: 0.5; background: rgba(100,200,255,0.1); }
-.t-item.drag-over { border-top: 2px solid rgba(100,200,255,0.6); }
-.t-drag-handle {
-  flex-shrink: 0; padding-right: 6px; cursor: grab; color: rgba(100,200,255,0.4);
-  font-size: 0.9rem; user-select: none;
+.t-item.dragging {
+  opacity: 0.7;
+  background: rgba(100,200,255,0.2) !important;
+  border-left-color: rgba(100,200,255,0.6);
+  box-shadow: 0 4px 12px rgba(100,200,255,0.25), inset 0 0 0 2px rgba(100,200,255,0.4);
+  transform: scale(1.01);
+  z-index: 1000;
 }
-.t-drag-handle:active { cursor: grabbing; }
+.t-item.drag-over {
+  border-top: 3px solid rgba(100,200,255,0.8);
+  border-bottom: none;
+  padding-top: 4px;
+  padding-bottom: 7px;
+}
+.t-drag-handle {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  color: rgba(100,200,255,0.5);
+  font-size: 0.8rem;
+  user-select: none;
+  border-radius: 4px;
+  transition: all 0.15s;
+  padding: 0;
+}
+.t-item:hover .t-drag-handle {
+  color: rgba(100,200,255,0.8);
+  background: rgba(100,200,255,0.15);
+}
+.t-drag-handle:active { cursor: grabbing; color: var(--accent); }
 .chk {
   width: 16px; height: 16px;
   flex-shrink: 0;
@@ -758,15 +787,44 @@ body { display: flex; flex-direction: column; height: 100vh; }
   border-left: 3px solid rgba(167,139,250,0.4);
   cursor: pointer; transition: all 0.15s;
 }
-.memo-item:hover { background: rgba(167,139,250,0.14); }
-.memo-item.dragging { opacity: 0.5; background: rgba(167,139,250,0.15); }
-.memo-item.drag-over { border-top: 2px solid rgba(167,139,250,0.6); }
-.memo-drag-handle {
-  position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
-  cursor: grab; color: rgba(167,139,250,0.4); font-size: 0.9rem; user-select: none;
+.memo-item:hover { background: rgba(167,139,250,0.14); cursor: grab; }
+.memo-item.dragging {
+  opacity: 0.7;
+  background: rgba(167,139,250,0.25) !important;
+  border-left: 3px solid rgba(167,139,250,0.6);
+  box-shadow: 0 4px 12px rgba(167,139,250,0.25), inset 0 0 0 2px rgba(167,139,250,0.4);
+  transform: scale(1.01);
+  z-index: 1000;
 }
-.memo-drag-handle:active { cursor: grabbing; }
-.memo-item { position: relative; padding-left: 28px; }
+.memo-item.drag-over {
+  border-top: 3px solid rgba(167,139,250,0.8);
+  border-bottom: none;
+  padding-top: 9px;
+  padding-bottom: 14px;
+}
+.memo-drag-handle {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: grab;
+  color: rgba(167,139,250,0.5);
+  font-size: 0.75rem;
+  user-select: none;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+.memo-item:hover .memo-drag-handle {
+  color: rgba(167,139,250,0.8);
+  background: rgba(167,139,250,0.18);
+}
+.memo-drag-handle:active { cursor: grabbing; color: #c4b5fd; }
+.memo-item { position: relative; padding-left: 40px; cursor: grab; }
 .memo-item-title { font-size: 0.88rem; font-weight: bold; color: #ddd6fe; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .memo-item-preview { font-size: 0.75rem; color: rgba(255,255,255,0.45); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .memo-item-date { font-size: 0.63rem; color: rgba(255,255,255,0.25); margin-top: 4px; }
@@ -1982,17 +2040,18 @@ function renderTodos() {
       saveTodos(); renderTodos();
     });
     // 拖放事件
-    div.addEventListener('dragstart', () => {
+    div.addEventListener('dragstart', (e) => {
       div.classList.add('dragging');
-      div.style.opacity = '0.5';
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', div.innerHTML);
     });
     div.addEventListener('dragend', () => {
       div.classList.remove('dragging');
-      div.style.opacity = '';
       document.querySelectorAll('.t-item').forEach(el => el.classList.remove('drag-over'));
     });
-    div.addEventListener('dragover', e => {
+    div.addEventListener('dragover', (e) => {
       e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
       const dragging = document.querySelector('.t-item.dragging');
       if (dragging && dragging !== div) {
         div.classList.add('drag-over');
@@ -2001,23 +2060,27 @@ function renderTodos() {
     div.addEventListener('dragleave', () => {
       div.classList.remove('drag-over');
     });
-    div.addEventListener('drop', e => {
+    div.addEventListener('drop', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       div.classList.remove('drag-over');
       const dragging = document.querySelector('.t-item.dragging');
       if (dragging && dragging !== div) {
-        const dragIdx = Array.from(list.children).indexOf(dragging);
-        const dropIdx = Array.from(list.children).indexOf(div);
-        if (dragIdx !== dropIdx) {
-          const filtered = show;
-          const dragId = dragging.dataset.todoid;
-          const dragItem = todos.find(x => x.id == dragId);
-          todos = todos.filter(x => x.id != dragId);
-          const insertIdx = todos.findIndex(x => x.id == div.dataset.todoid);
-          if (dropIdx < dragIdx) {
-            todos.splice(insertIdx, 0, dragItem);
+        const dragId = parseInt(dragging.dataset.todoid);
+        const dropId = parseInt(div.dataset.todoid);
+        const dragItem = todos.find(x => x.id === dragId);
+        const dropItem = todos.find(x => x.id === dropId);
+
+        if (dragItem && dropItem) {
+          const dragPos = todos.indexOf(dragItem);
+          const dropPos = todos.indexOf(dropItem);
+
+          todos.splice(dragPos, 1);
+          const newDropPos = todos.indexOf(dropItem);
+          if (dragPos < dropPos) {
+            todos.splice(newDropPos, 0, dragItem);
           } else {
-            todos.splice(insertIdx + 1, 0, dragItem);
+            todos.splice(newDropPos, 0, dragItem);
           }
           saveTodos(); renderTodos();
         }
@@ -2335,17 +2398,18 @@ function renderMemos() {
       <div class="memo-item-date">${m.updated || m.created || ''}</div>`;
     div.addEventListener('click', () => openMemoEdit(m.id));
     // 拖放事件
-    div.addEventListener('dragstart', () => {
+    div.addEventListener('dragstart', (e) => {
       div.classList.add('dragging');
-      div.style.opacity = '0.5';
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', div.innerHTML);
     });
     div.addEventListener('dragend', () => {
       div.classList.remove('dragging');
-      div.style.opacity = '';
       document.querySelectorAll('.memo-item').forEach(el => el.classList.remove('drag-over'));
     });
-    div.addEventListener('dragover', e => {
+    div.addEventListener('dragover', (e) => {
       e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
       const dragging = document.querySelector('.memo-item.dragging');
       if (dragging && dragging !== div) {
         div.classList.add('drag-over');
@@ -2354,21 +2418,30 @@ function renderMemos() {
     div.addEventListener('dragleave', () => {
       div.classList.remove('drag-over');
     });
-    div.addEventListener('drop', e => {
+    div.addEventListener('drop', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       div.classList.remove('drag-over');
       const dragging = document.querySelector('.memo-item.dragging');
       if (dragging && dragging !== div) {
-        const dragId = dragging.dataset.memoid;
-        const dragItem = memos.find(x => x.id == dragId);
-        memos = memos.filter(x => x.id != dragId);
-        const insertIdx = memos.findIndex(x => x.id == div.dataset.memoid);
-        if (insertIdx >= 0) {
-          memos.splice(insertIdx, 0, dragItem);
-        } else {
-          memos.push(dragItem);
+        const dragId = parseInt(dragging.dataset.memoid);
+        const dropId = parseInt(div.dataset.memoid);
+        const dragItem = memos.find(x => x.id === dragId);
+        const dropItem = memos.find(x => x.id === dropId);
+
+        if (dragItem && dropItem) {
+          const dragPos = memos.indexOf(dragItem);
+          const dropPos = memos.indexOf(dropItem);
+
+          memos.splice(dragPos, 1);
+          const newDropPos = memos.indexOf(dropItem);
+          if (dragPos < dropPos) {
+            memos.splice(newDropPos, 0, dragItem);
+          } else {
+            memos.splice(newDropPos, 0, dragItem);
+          }
+          saveMemos(); renderMemos();
         }
-        saveMemos(); renderMemos();
       }
     });
     list.appendChild(div);
