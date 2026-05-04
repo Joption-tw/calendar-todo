@@ -555,6 +555,12 @@ body { display: flex; flex-direction: column; height: 100vh; }
   font-size: 0.62rem; color: rgba(100,200,255,0.55);
   margin-top: 2px; display: inline-block;
 }
+.t-time {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+  margin-top: 2px;
+  display: block;
+}
 
 /* ══ Modal ══ */
 .modal-bg {
@@ -827,7 +833,10 @@ body { display: flex; flex-direction: column; height: 100vh; }
 .memo-item { position: relative; padding-left: 40px; cursor: grab; }
 .memo-item-title { font-size: 0.88rem; font-weight: bold; color: #ddd6fe; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .memo-item-preview { font-size: 0.75rem; color: rgba(255,255,255,0.45); line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.memo-item-date { font-size: 0.63rem; color: rgba(255,255,255,0.25); margin-top: 4px; }
+.memo-item-date { font-size: 0.62rem; color: rgba(255,255,255,0.28); margin-top: 4px; display: flex; gap: 8px; }
+.memo-item-date span { display: flex; gap: 3px; }
+.memo-item-date .created { color: rgba(255,255,255,0.25); }
+.memo-item-date .updated { color: rgba(255,255,255,0.35); }
 .memo-empty { text-align: center; color: rgba(255,255,255,0.28); font-size: 0.8rem; padding: 24px 0; }
 /* ══ 備忘錄編輯 Modal ══ */
 .memo-edit-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.72); z-index: 300; align-items: center; justify-content: center; }
@@ -2025,6 +2034,7 @@ function renderTodos() {
       <div class="t-body">
         <div class="t-text">${esc(t.text)}</div>
         ${imgCount ? `<span class="t-img-badge">🖼 ${imgCount} 張圖</span>` : ''}
+        <span class="t-time">${t.created || ''}</span>
       </div>
       <button class="del-btn" title="刪除">✕</button>`;
 
@@ -2395,7 +2405,10 @@ function renderMemos() {
       <span class="memo-drag-handle">⋮⋮</span>
       <div class="memo-item-title">${esc(m.title || '（無標題）')}</div>
       ${preview ? `<div class="memo-item-preview">${esc(preview)}${hasMore ? '…' : ''}</div>` : ''}
-      <div class="memo-item-date">${m.updated || m.created || ''}</div>`;
+      <div class="memo-item-date">
+        ${m.created ? `<span class="created">新增: ${m.created}</span>` : ''}
+        ${m.updated && m.updated !== m.created ? `<span class="updated">更新: ${m.updated}</span>` : ''}
+      </div>`;
     div.addEventListener('click', () => openMemoEdit(m.id));
     // 拖放事件
     div.addEventListener('dragstart', (e) => {
