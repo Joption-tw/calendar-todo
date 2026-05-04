@@ -1331,10 +1331,6 @@ body { display: flex; flex-direction: column; height: 100vh; }
 
   <!-- 待辦清單 -->
   <div class="todo-panel">
-    <div class="right-panel-tabs" id="rightPanelTabs">
-      <button class="right-panel-tab active" data-rp="todo">☑ 待辦事項</button>
-      <button class="right-panel-tab" data-rp="memo">📝 備忘錄</button>
-    </div>
     <div class="tabs">
       <button class="tab active" data-f="all">全部</button>
       <button class="tab" data-f="pending">待辦</button>
@@ -2519,24 +2515,11 @@ document.getElementById('memoEditBg').addEventListener('click', e => {
 });
 
 // ══ 寬螢幕右側面板切換 ══
-function switchRightPanel(panel) {
-  const todo = document.querySelector('.todo-panel');
-  const memo = document.getElementById('memoPanel');
-  if (panel === 'todo') {
-    if (todo) { todo.style.display = ''; }
-    if (memo) memo.classList.remove('desktop-show');
-  } else {
-    if (todo) todo.style.display = 'none';
-    if (memo) memo.classList.add('desktop-show');
-  }
-  document.querySelectorAll('.right-panel-tab').forEach(t => t.classList.toggle('active', t.dataset.rp === panel));
-}
-const rightPanelTabsEl = document.getElementById('rightPanelTabs');
-if (rightPanelTabsEl) {
-  rightPanelTabsEl.querySelectorAll('.right-panel-tab').forEach(t => {
-    t.addEventListener('click', () => switchRightPanel(t.dataset.rp));
-  });
-}
+// 寬螢幕預設顯示待辦事項，隱藏備忘錄
+const todoPanel = document.querySelector('.todo-panel');
+const memoPanel = document.getElementById('memoPanel');
+if (todoPanel) todoPanel.style.display = '';
+if (memoPanel) memoPanel.classList.remove('desktop-show');
 
 // ══ 初始化 ══
 renderCal();
